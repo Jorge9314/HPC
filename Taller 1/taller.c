@@ -91,8 +91,13 @@ void mult(int f1, int c1, int f2, int c2){
 	res = func_mat(f1, c2);
 	for(i=0; i<f1; i++){
 		for(j=0; j<c2; j++){
-			for(k=0; k<c1; k++){
-				res[i][j] += x[i][k] * y[k][j]; 
+			res[i][j] = 0;
+		}
+	}
+	for(i=0; i<f1; i++){
+		for(j=0; j<c2; j++){
+			for(k=0; k<c1; ++k){
+				res[j][i] += x[k][i] * y[j][k]; 
 			}
 		}
 	}
