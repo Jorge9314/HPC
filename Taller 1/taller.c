@@ -67,8 +67,18 @@ void sum(int sz)
 	}
 }
 
+void print_mat(int r, int c, float** x){
+	int i, j;
+	for(i=0; i<r; i++){
+		for(j=0; j<c; j++){
+			printf(" %f ", x[i][j]);
+		}
+		printf("\n \n");
+	}
+}
+
 void mult(int f1, int c1, int f2, int c2){
-	if(f1 != c2){
+	if(c1 != f2){
 		puts("ERROR NO SE PUEDEN MULTIPLICAR");
 		exit(1);
 	}
@@ -79,16 +89,14 @@ void mult(int f1, int c1, int f2, int c2){
 	x = func_mat(f1, c1);
 	y = func_mat(f2, c2);
 	res = func_mat(f1, c2);
-	for(i=0; i<c1; i++){
-		for(j=0; j<f2; j++){
-			for(k=0; k<f1; k++){
-				res[i][j] += x[k][i] * y[j][k]; 
+	for(i=0; i<f1; i++){
+		for(j=0; j<c2; j++){
+			for(k=0; k<c1; k++){
+				res[i][j] += x[i][k] * y[k][j]; 
 			}
 		}
 	}
-	for(i=0; i<f1; i++){
-		for(j=0; j<f1; j++){
-			printf("%f \n", res[i][j]);
-		}
-	}
+	print_mat(f2, c2, y);
+	print_mat(f1, c1, x);
+	print_mat(f1, f1, res);
 }
