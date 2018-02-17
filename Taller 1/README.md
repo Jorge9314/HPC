@@ -15,7 +15,7 @@ NOTA:
 
 LINUX
 
-> ./salida < entrada.in > salida.out
+> ./salida < entrada.in > salida.csv
 
 WINDOWS
 
