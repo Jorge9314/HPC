@@ -10,12 +10,18 @@ NOTA:
 PARA EJECUTAR EL PROGRAMA Y QUE SE ENTREGUEN EN .CSV
 
 > gcc taller.c -o salida
+
 LINUX
+
 > ./salida < entrada.in > salida.out
+
 WINDOWS
+
 > salida < entrada.in > salida.out
 ---
 El archivo de entrada esta así:
 > **primer linea**: Tamaño de los vectores.
+
 > **segunda linea**: Filas y columnas de primer matriz.
+
 > **segunda linea**: Filas y columnas de segunda matriz.
