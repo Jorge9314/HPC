@@ -9,21 +9,20 @@ void mult();
 
 int main() {
 	int sz, fila1, columna1, fila2, columna2;
-	/*
-	printf("Ingrese el numero de elementos del vector");
+	
+	//printf("Ingrese el numero de elementos del vector");
 	scanf("%d", &sz);
 	sum(sz);
-	*/
-	printf("Ingrese las filas y luego las columnas de la primer matriz");
+	
+	//printf("Ingrese las filas y luego las columnas de la primer matriz");
 	scanf("%d %d", &fila1, &columna1);
-	printf("Ingrese las filas y luego las columnas de la segunda matriz");
+	//printf("Ingrese las filas y luego las columnas de la segunda matriz");
 	scanf("%d %d", &fila2, &columna2);
 	mult(fila1, columna1, fila2, columna2);
 	return 0;
 }
 
-float * func_vect(int t)
-{
+float * func_vect(int t){
 	int i, x = t;
 	float* ptr;
 	ptr = (float *)malloc(x * sizeof(float));
@@ -53,17 +52,11 @@ float ** func_mat(int f, int c){
 	return matriz;
 } 
 
-void sum(int sz)
-{
+
+void print_vec(int x, float* y){
 	int i;
-	float* x;
-	float* y;
-	x = func_vect(sz);
-	y = func_vect(sz);
-	float z[sz];
-	for(i=0; i<sz; i++){
-		z[i] = x[i] + y[i];
-		printf("%f \n", z[i]);
+	for(i=0; i<x; ++i){
+		printf("%f ", y[i]);
 	}
 }
 
@@ -75,6 +68,24 @@ void print_mat(int r, int c, float** x){
 		}
 		printf("\n \n");
 	}
+}
+
+void sum(int sz){
+	int i;
+	float* x;
+	float* y;
+	x = func_vect(sz);
+	y = func_vect(sz);
+	float z[sz];
+	for(i=0; i<sz; i++){
+		z[i] = x[i] + y[i];
+		printf("%f \n", z[i]);
+	}
+	printf("Vectores Entrada: \n");
+	print_vec(sz, x);
+	print_vec(sz, y);
+	printf("Vector Resultado");
+
 }
 
 void mult(int f1, int c1, int f2, int c2){
@@ -101,7 +112,9 @@ void mult(int f1, int c1, int f2, int c2){
 			}
 		}
 	}
+	printf("Print matrices entrada: ");
 	print_mat(f2, c2, y);
 	print_mat(f1, c1, x);
+	printf("Print matriz resultado: ");
 	print_mat(f1, f1, res);
 }
