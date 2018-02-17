@@ -7,7 +7,9 @@ NOTA:
 	- Las matrices deberán inicializarse de manera aleatoria al igual que los vectores.
 	- Deberán guardarse tanto las matrices de entrada y el resultado en un archivo csv. Lo mismo para los vectores.
 
-PARA EJECUTAR EL PROGRAMA Y QUE SE ENTREGUEN EN .CSV
+---
+
+***PARA EJECUTAR EL PROGRAMA Y QUE SE ENTREGUEN EN .CSV***
 
 > gcc taller.c -o salida
 
