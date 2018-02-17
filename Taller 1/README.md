@@ -6,4 +6,6 @@ NOTA:
 	- El tamaño de los vectores del punto 1 y de las matrices del punto 2 se definiran por línea de comandos.
 	- Las matrices deberán inicializarse de manera aleatoria al igual que los vectores.
 	- Deberán guardarse tanto las matrices de entrada y el resultado en un archivo csv. Lo mismo para los vectores.
-	
+
+PARA EJECUTAR EL PROGRAMA Y QUE SE ENTREGUEN EN .CSV
+	> gcc taller.c -o salida.c < entradas.in > resultados.out 
