@@ -16,6 +16,6 @@ WINDOWS
 > salida < entrada.in > salida.out
 ---
 El archivo de entrada esta así:
-> <b>primer linea<b>: Tamaño de los vectores.
-> <b>segunda linea<b>: Filas y columnas de primer matriz.
-> <b>segunda linea<b>: Filas y columnas de segunda matriz.
+> <b>primer linea<\b>: Tamaño de los vectores.
+> <b>segunda linea<\b>: Filas y columnas de primer matriz.
+> <b>segunda linea<\b>: Filas y columnas de segunda matriz.
