@@ -17,7 +17,7 @@ LINUX
 
 WINDOWS
 
-> salida < entrada.in > salida.out
+> salida < entrada.in > salida.csv
 ---
 El archivo de entrada esta así:
 > **primer linea**: Tamaño de los vectores.
