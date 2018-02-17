@@ -24,4 +24,4 @@ El archivo de entrada esta así:
 
 > **segunda linea**: Filas y columnas de primer matriz.
 
-> **segunda linea**: Filas y columnas de segunda matriz.
+> **tercer linea**: Filas y columnas de segunda matriz.
