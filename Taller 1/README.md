@@ -19,7 +19,7 @@ WINDOWS
 
 > salida < entrada.in > salida.csv
 ---
-El archivo de [entrada](/Taller 1/entrada.in) esta así:
+El archivo de [entrada](/Taller%201/entrada.in) esta así:
 > **primer linea**: Tamaño de los vectores.
 
 > **segunda linea**: Filas y columnas de primer matriz.
