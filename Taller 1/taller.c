@@ -9,16 +9,13 @@ void mult(int f1, int c1, int f2, int c2);
 
 int main() {
     int sz, fila1, columna1, fila2, columna2;
-    /*
-    printf("Ingrese el numero de elementos del vector");
+    //printf("Ingrese el numero de elementos del vector");
     scanf("%d", &sz);
-    sum(sz);
-    */
-
-    printf("Ingrese las filas y luego las columnas de la primer matriz");
+    //printf("Ingrese las filas y luego las columnas de la primer matriz");
     scanf("%d %d", &fila1, &columna1);
-    printf("Ingrese las filas y luego las columnas de la segunda matriz");
+    //printf("Ingrese las filas y luego las columnas de la segunda matriz");
     scanf("%d %d", &fila2, &columna2);
+	sum(sz);
     mult(fila1, columna1, fila2, columna2);
     return 0;
 }
@@ -53,18 +50,14 @@ float ** func_mat(int f, int c){
     return matriz;
 } 
 
-void sum(int sz){
-    int i;
-    float* x;
-    float* y;
-    x = func_vect(sz);
-    y = func_vect(sz);
-    float z[sz];
-    for(i=0; i<sz; i++){
-        z[i] = x[i] + y[i];
-        printf("%f \n", z[i]);
+void print_vec(int sz, float* z){
+	int i;
+	for(i=0; i<sz; i++){
+        printf("%f ", z[i]);
     }
+	printf("\n \n");
 }
+
 
 void print_mat(int r, int c, float** x){
     int i, j;
@@ -74,6 +67,26 @@ void print_mat(int r, int c, float** x){
         }
         printf("\n \n");
     }
+}
+
+void sum(int sz){
+    int i;
+    float* x;
+    float* y;
+    x = func_vect(sz);
+    y = func_vect(sz);
+    float z[sz];
+	printf("Vectores entrada: \n");
+	printf("Vector 1: \n");
+	print_vec(sz, x);
+	printf("Vector 2: \n");
+	print_vec(sz, y);
+	printf("Vector Resultado: \n");
+    for(i=0; i<sz; i++){
+        z[i] = x[i] + y[i];
+        printf("%f ", z[i]);
+    }
+	printf("\n \n");
 }
 
 void mult(int f1, int c1, int f2, int c2){
@@ -100,7 +113,11 @@ void mult(int f1, int c1, int f2, int c2){
             }
         }
     }
+	printf("Matrices de Entrada:  \n \n");
+	printf("Matriz 1:  \n");
     print_mat(f1, c1, x);
+	printf("Matriz 2:  \n");
     print_mat(f2, c2, y);
+	printf("Matriz Resultado:  \n");
     print_mat(f1, c2, res);
 }
