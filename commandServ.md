@@ -2,7 +2,7 @@
 
 + sinfo : Muestra el estaddo de los nodos 
 + squeue : Muestra las tareas encoladas en los ndoos
-+ srun -N**(numeroNodos)** **(function)** : srun -N6 hostname
++ srun -N**numeroNodos** **funcion** : ej: srun -N6 hostname
     - **numeroNodos** : no puede ser mayor al numero de nodos disponibles
     - **funcion** : 
         - **hostname** manda una programa que retorna el nombre del host
