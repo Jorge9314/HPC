@@ -1,4 +1,4 @@
-#SLURM Example
+# SLURM Example
 
 + sinfo : Muestra el estaddo de los nodos 
 + squeue : Muestra las tareas encoladas en los ndoos
