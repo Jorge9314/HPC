@@ -14,7 +14,7 @@ El programa sin paralelizar [TallerO](tallerO.c) hace la multiplicación de las 
 
 El programa paralelizado con openMP [TallerF](tallerF.c) hace la multiplicacion de las matrices.
 
-> gcc tallerF.c -o tallerP
+> gcc tallerF.c -o tallerP -fopenmp
 
 > time ./tallerP < matrices.in > salida2.out
 
