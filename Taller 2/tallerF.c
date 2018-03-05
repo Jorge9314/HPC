@@ -38,6 +38,7 @@ float * func_vect(int t){
 
 float ** func_mat(int f, int c){
     int i,j;
+    float dt;
     float** matriz;
     matriz = (float **)malloc(f * sizeof(float *));
     for(i = 0; i < f; ++i){
@@ -46,7 +47,9 @@ float ** func_mat(int f, int c){
     
     for(i = 0; i < f; ++i){
         for(j = 0; j < c; ++j){
-            matriz[i][j] = rand() % 10;
+            //matriz[i][j] = rand() % 10;
+            scanf("%f", &dt);
+            matriz[i][j] = dt;
         }
     }
     return matriz;
@@ -108,10 +111,9 @@ void mult(int f1, int c1, int f2, int c2){
             res[i][j] = 0;
         }
     }
-    #pragma omp parallel private(i,j,k)
+    #pragma omp parallel num_threads(8) private(i,j,k)
     {   
-        int nthreads = omp_get_num_threads();
-        printf("Number of threads = %d\n", nthreads);
+        #pragma omp for
         for(i=0; i<f1; i++){
             for(j=0; j<c2; j++){
                 for(k=0; k<c1; ++k){

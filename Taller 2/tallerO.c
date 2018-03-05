@@ -38,6 +38,7 @@ float * func_vect(int t){
 
 float ** func_mat(int f, int c){
     int i,j;
+    float dt;
     float** matriz;
     matriz = (float **)malloc(f * sizeof(float *));
     for(i = 0; i < f; ++i){
@@ -45,7 +46,9 @@ float ** func_mat(int f, int c){
     }   
     for(i = 0; i < f; ++i){
         for(j = 0; j < c; ++j){
-            matriz[i][j] = rand() % 10;
+            //matriz[i][j] = rand() % 10;
+            scanf("%f", &dt);
+            matriz[i][j] = dt;
         }
     }
     return matriz;
