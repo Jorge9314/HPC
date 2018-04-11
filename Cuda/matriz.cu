@@ -6,8 +6,8 @@
 
 __global__
 void PictureKernell(float* d_Pin, float* d_Pout, int n, int m){
-    int Row = blockIdx.y*blockDim.y + threadIdx.y;
-    int Col = blockIdx.x*blockDim.x + threadIdx.x;
+    int Row = blockIdx.y * blockDim.y + threadIdx.y;
+    int Col = blockIdx.x * blockDim.x + threadIdx.x;
 
     if ((Row < m) && (Col < n)){
         d_Pout[Row*n+Col] = 2*d_Pin[Row*n+Col]; 
@@ -21,7 +21,7 @@ void print(float* M, int rows, int cols){
         for(int j=0; j<cols; j++){
             printf("%f ", M[i * cols + j]);
         }
-        print("\n");
+        printf("\n");
     }
 }
 
@@ -36,10 +36,10 @@ void receive(float* M, FILE* stream, int rows, int cols){
 }
 
 int main(int argc, char** argv){
-    if (argc != 3) {
+    if (argc != 2) {
         printf("Must be called with the names of the files \n");
+        return 1;
     }
-    return 1;
 
     float *A_in, *A_out;
     int rowsA, colsA;
@@ -56,29 +56,32 @@ int main(int argc, char** argv){
     A_out = (float*)malloc(rowsA * colsA * sizeof(float));
 
     receive(A_in, f1, rowsA, colsA);    
-
+    //print(A_in, rowsA, colsA);
+    
     //GPU
     cudaError_t error = cudaSuccess;
     float *d_Ain, *d_Aout;
     int blockSize = 32;
-    int gridSize = ceil(colsA / float(blockSize));
+    //int gridSize = ceil((colsA*rowsA) / float(blockSize));
+    dim3 dimBlock(blockSize, blockSize, 1);
+    dim3 dimGrid(ceil(colsA / float(blockSize)), ceil(rowsA / float(blockSize)), 1);
 
     error = cudaMalloc((void**)&d_Ain, rowsA * colsA * sizeof(float));
     if(error != cudaSuccess){
-        print("Error allocating memory d_Ain");
+        printf("Error allocating memory d_Ain");
         return 1;
     }
 
     error = cudaMalloc((void**)&d_Aout, rowsA * colsA * sizeof(float));
     if(error != cudaSuccess){
-        print("Error allocating memory d_Aout");
+        printf("Error allocating memory d_Aout");
         return 1;
     }
 
     cudaMemcpy(d_Ain, A_in, rowsA * colsA * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_Aout, A_out, rowsA * colsA * sizeof(float), cudaMemcpyHostToDevice);
 
-    PictureKernell<<<gridSize, blockSize>>>(d_Ain, d_Aout, colsA, rowsA);
+    PictureKernell<<<dimGrid, dimBlock>>>(d_Ain, d_Aout, rowsA, colsA);
     cudaDeviceSynchronize();
 
     cudaMemcpy(A_out, d_Aout, rowsA * colsA * sizeof(float), cudaMemcpyDeviceToHost);
