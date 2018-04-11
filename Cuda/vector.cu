@@ -58,8 +58,8 @@ int main(int argc, char** argv){
 
     receive(h_A, f1, sizeA);
     receive(h_B, f2, sizeA);
-    print(h_A, sizeA);
-    print(h_B, sizeB);
+    //print(h_A, sizeA);
+    //print(h_B, sizeB);
     
     //GPU
     float *d_A, *d_B, *d_C;
@@ -91,7 +91,7 @@ int main(int argc, char** argv){
     cudaMemcpy(d_B, h_B, sizeA*sizeof(float), cudaMemcpyHostToDevice);
 
     sum<<<gridSize, blockSize>>>(d_A, d_B, d_C, sizeA);
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
 
     cudaMemcpy(h_C, d_C, sizeA*sizeof(float), cudaMemcpyDeviceToHost);
     print(h_C, sizeA);

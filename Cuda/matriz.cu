@@ -79,10 +79,10 @@ int main(int argc, char** argv){
     }
 
     cudaMemcpy(d_Ain, A_in, rowsA * colsA * sizeof(float), cudaMemcpyHostToDevice);
-    cudaMemcpy(d_Aout, A_out, rowsA * colsA * sizeof(float), cudaMemcpyHostToDevice);
+    //cudaMemcpy(d_Aout, A_out, rowsA * colsA * sizeof(float), cudaMemcpyHostToDevice);
 
     PictureKernell<<<dimGrid, dimBlock>>>(d_Ain, d_Aout, rowsA, colsA);
-    cudaDeviceSynchronize();
+    //cudaDeviceSynchronize();
 
     cudaMemcpy(A_out, d_Aout, rowsA * colsA * sizeof(float), cudaMemcpyDeviceToHost);
     print(A_out, rowsA, colsA);
