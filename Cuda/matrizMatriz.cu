@@ -98,7 +98,7 @@ int main(int argc, char** argv){
     cudaMemcpy(d_Ain, A_in, rowsA * colsA * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_Bin, B_in, rowsB * colsB * sizeof(float), cudaMemcpyHostToDevice);
 
-    PictureKernell<<<dimGrid, dimBlock>>>(d_Ain, d_Bin, d_Cout, colsA);
+    matrizKernell<<<dimGrid, dimBlock>>>(d_Ain, d_Bin, d_Cout, colsA);
     //cudaDeviceSynchronize();
 
     cudaMemcpy(C_out, d_Cout, rowsA * colsB * sizeof(float), cudaMemcpyDeviceToHost);
