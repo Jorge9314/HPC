@@ -5,16 +5,16 @@
 #include<cuda.h>
 
 __global__
-void matrizKernell(float* A, float* B, float* C, int Width){
+void matrizKernell(float* A, float* B, float* C, int rowsA, int colsA, int rowsB, int colsB){
     int Row = blockIdx.y * blockDim.y + threadIdx.y;
     int Col = blockIdx.x * blockDim.x + threadIdx.x;
     
-    if((Row < Width) && (Col < Width)){
+    if((Row < rowsA) && (Col < colsB)){
         float sum = 0;
-        for(int i=0; i < Width; ++i){
-            sum += A[Row*Width+i] * B[i*Width+Col];
+        for(int i=0; i < colsB; ++i){
+            sum += A[Row*colsA+i] * B[i*colsB+Col];
         }
-        C[Row*Width+Col] = sum;
+        C[Row*colsB+Col] = sum;
     }
 }
 
@@ -98,7 +98,7 @@ int main(int argc, char** argv){
     cudaMemcpy(d_Ain, A_in, rowsA * colsA * sizeof(float), cudaMemcpyHostToDevice);
     cudaMemcpy(d_Bin, B_in, rowsB * colsB * sizeof(float), cudaMemcpyHostToDevice);
 
-    matrizKernell<<<dimGrid, dimBlock>>>(d_Ain, d_Bin, d_Cout, colsA);
+    matrizKernell<<<dimGrid, dimBlock>>>(d_Ain, d_Bin, d_Cout, rowsA, colsA, rowsB, colsB);
     //cudaDeviceSynchronize();
 
     cudaMemcpy(C_out, d_Cout, rowsA * colsB * sizeof(float), cudaMemcpyDeviceToHost);
