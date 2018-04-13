@@ -11,7 +11,7 @@ void matrizKernell(float* A, float* B, float* C, int rowsA, int colsA, int rowsB
     
     if((Row < rowsA) && (Col < colsB)){
         float sum = 0;
-        for(int i=0; i < colsB; ++i){
+        for(int i=0; i < colsB; i++){
             sum += A[Row*colsA+i] * B[i*colsB+Col];
         }
         C[Row*colsB+Col] = sum;
@@ -57,8 +57,8 @@ int main(int argc, char** argv){
     
     //CPU
     A_in = (float*)malloc(rowsA * colsA * sizeof(float));
-    B_in = (float*)malloc(rowsA * colsA * sizeof(float));
-    C_out = (float*)malloc(rowsA * colsA * sizeof(float));
+    B_in = (float*)malloc(rowsB * colsB * sizeof(float));
+    C_out = (float*)malloc(rowsA * colsB * sizeof(float));
     
     receive(A_in, f1, rowsA, colsA);    
     receive(B_in, f2, rowsB, colsB);
