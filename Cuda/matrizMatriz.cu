@@ -9,10 +9,10 @@ void matrizKernell(float* A, float* B, float* C, int Width){
     int Row = blockIdx.y * blockDim.y + threadIdx.y;
     int Col = blockIdx.x * blockDim.x + threadIdx.x;
     
-    if((Row < rowsA) && (Col < colsB)){
+    if((Row < Width) && (Col < Width)){
         float sum = 0;
         for(int i=0; i < Width; ++i){
-            sum += A[Row*Width+i] * B[k*Width+Col];
+            sum += A[Row*Width+i] * B[i*Width+Col];
         }
         C[Row*Width+Col] = sum;
     }
@@ -48,7 +48,7 @@ int main(int argc, char** argv){
     float *A_in, *B_in, *C_out;
     int rowsA, colsA, rowsB, colsB;
 
-    FILE *f1 *f2;
+    FILE *f1, *f2;
     f1 = fopen(argv[1], "r");
     f2 = fopen(argv[2], "r");
 
@@ -65,7 +65,7 @@ int main(int argc, char** argv){
     //print(A_in, rowsA, colsA);
     
     if(colsA != rowsB){
-        print("Debe ser igual el numero de las columnas de A, a las filas de B");
+        printf("Debe ser igual el numero de las columnas de A, a las filas de B");
         return 1;
     }
 
