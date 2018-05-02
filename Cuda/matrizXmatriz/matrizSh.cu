@@ -6,6 +6,7 @@
 
 __global__
 void matrixMultKernel(float* d_M, float* d_N, float* d_P, int width){
+    const int TILE_WIDTH = 2;
     __shared__ float Mds[TILE_WIDTH][TILE_WIDTH];
     __shared__ float Nds[TILE_WIDTH][TILE_WIDTH];
 
@@ -20,8 +21,8 @@ void matrixMultKernel(float* d_M, float* d_N, float* d_P, int width){
     float Pvalue = 0;
 
     for(int i = 0; i < width/TILE_WIDTH; ++i){
-      Mds[ty][tx] = d_M[Row*width + m*TILE_WIDTH + tx];
-      Nds[ty][tx] = d_N[(m*TILE_WIDTH + ty)*width + Col];
+      Mds[ty][tx] = d_M[Row*width + i*TILE_WIDTH + tx];
+      Nds[ty][tx] = d_N[(i*TILE_WIDTH + ty)*width + Col];
       __syncthreads();
 
       for(int k=0; k<TILE_WIDTH; ++k){
