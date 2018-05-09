@@ -4,7 +4,7 @@
 #include<cuda.h>
 using namespace std;
 
-#define TILE_WIDTH 32 //¿máximo?
+#define TILE_WIDTH 32
 
 __global__ 
 void MultiplicaMatricesCU(int* A,int filA,int colA,int* B,int filB,int colB,int* C){//filC=filA,colC=colB
@@ -15,8 +15,8 @@ void MultiplicaMatricesCU(int* A,int filA,int colA,int* B,int filB,int colB,int*
 
 	//Para saber en qué bloque y qué hilo estamos
 	int bx = blockIdx.x;
-  	int by = blockIdx.y;
-  	int tx = threadIdx.x;
+	int by = blockIdx.y;
+	int tx = threadIdx.x;
 	int ty = threadIdx.y;
 	int gx = gridDim.x;
 	int gy = gridDim.y;
@@ -28,7 +28,7 @@ void MultiplicaMatricesCU(int* A,int filA,int colA,int* B,int filB,int colB,int*
 	int suma = 0;//para llevar la suma de las multiplicaciones
 
 	int n = 0, m = 0;
-  	while(m < gx && n < gy){
+	while(m < gx && n < gy){
 		/* De A queremos sacar las columnas, por eso:
 		* col = ( ( m * TILE_WIDTH ) + tx )
 		* col = ( ( bx * TILE_WIDTH ) + tx )
@@ -79,9 +79,9 @@ void multiplicaMatrices(int* X,int filX,int colX,int* Y,int filY,int colY,int* Z
 __host__ 
 void imprime(int* A,int filas, int columnas){//imprime como si fuera una matriz
 	for(int i = 0; i < filas; i++){
-        	for(int j = 0; j < columnas; j++){
-            		cout<<A[(i*columnas)+j]<<" ";
-        	}
+		for(int j = 0; j < columnas; j++){
+			cout<<A[(i*columnas)+j]<<" ";
+	}
         cout<<endl;
     }
 }
@@ -106,11 +106,11 @@ bool compara(int *A, int *B, int filas, int columnas){
 int main(void){
 
 	clock_t startCPU,endCPU,startGPU,endGPU;
-  	cudaError_t error = cudaSuccess;
+	cudaError_t error = cudaSuccess;
 	int *A,*B,*C; //A[filA][colA],B[filB][colB],C[filA][colB]
 	int *d_A,*d_B,*d_C,*h_C;
 	//int filA=2048,colA=2048,filB=2048,colB=2048;
-	int filA=1,colA=1024,filB=1024,colB=1;
+	int filA=1024,colA=1024,filB=1024,colB=1024;
 	//-------------------------------CPU--------------------------------------------------------------------
 	A=(int*)malloc(filA*colA*sizeof(int));
 	B=(int*)malloc(filB*colB*sizeof(int));
@@ -159,8 +159,8 @@ int main(void){
 
 	//Depende directamente de la dimensión de las matrices
 	dim3 dimblock(32,32,1);
-	dim3 dimGrid(32,32,1);
-  	//dim3 dimGrid(ceil((double)(colB/32)),ceil((double)(filA/32)),1);
+	//dim3 dimGrid(32,32,1);
+	dim3 dimGrid(ceil((double)(colB/32)),ceil((double)(filA/32)),1);
 
 	MultiplicaMatricesCU<<<dimGrid,dimblock>>>(d_A,filA,colA,d_B,filB,colB,d_C);
 
@@ -169,8 +169,15 @@ int main(void){
 	cudaMemcpy(h_C,d_C,filA*colB*sizeof(int),cudaMemcpyDeviceToHost);
 
 	endGPU = clock();
-
-	//imprime(h_C,filA,colB);
+	/*
+	COMENTARIO: IMPRESIONES DE PRUEBA
+	cout << "MATRIZ A" << endl;
+	imprime(A, filA,colA);
+	cout << endl << "MATRIZ B" << endl;
+	imprime(B, filB,colB);
+	cout << endl << "MATRIZ RESULTADO" << endl;
+	imprime(h_C, filA,colB);
+	*/
 	double time_GPU=((double)(endGPU-startGPU))/CLOCKS_PER_SEC;
 	cout<<"El tiempo transcurrido en la GPU fue: "<<time_GPU<<endl;
 	//-----------------------------------------------------------------------------------
