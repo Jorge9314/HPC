@@ -1,0 +1,24 @@
+1) Realizar pruebas modulo sin optimizacion.
+    1.1) Generador de matrices. ALIRIO
+    1.2) Imprimir tiempos GPU CPU.
+2) Pruebas con Cuda.
+    2.1) Generador de matrices.
+    2.2) Imprimir tiempos GPU CPU.
+3) Pruebas con shared memory.
+    3.1) Generador de matrices.
+    3.2) Imprimir tiempos GPU CPU.
+4) Graficas comparativas tiempo ejecucion.
+5) Graficas comparativas aceleracion.
+6) construccion del documento.
+    6.1) Concluciones puntuales sobre las graficas.
+    6.2) Hacer markdown resultados y reportes del proceso.
+    6.3) Investigacion caracteristicas GTX 980, GTX 780.
+7) Subir archivo SLURM repositorio.
+
+Alirio: Adaptar modulo recepcion de matrices csv 1.1), 2.1), 3.1).
+        Implementar tiempos de ejecucion 1.2), 2.2).
+Cristian: Realizar recoleccion de datos 1),2),3).
+          Realizar graficos con los datos 4).
+          Realizar graficas de aceleracion 5).
+          Subir archivo SLURM 7).
+Jorge: Construccion del documento 6).
