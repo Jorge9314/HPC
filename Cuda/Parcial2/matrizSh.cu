@@ -2,6 +2,7 @@
 #include<stdio.h>
 #include<malloc.h>
 #include<cuda.h>
+#include "archivos_csv.c"
 using namespace std;
 
 #define TILE_WIDTH 32
@@ -103,21 +104,57 @@ bool compara(int *A, int *B, int filas, int columnas){
 	return true;
 }
 
-int main(void){
+int main(int argc, char *argv[]){
+
+	if(argc != 3){
+		printf("no se han ingresado los archivos necesarios\n");
+	}
+
+	FILE *fp;
+	fp = fopen(argv[1], "r");
+
+	if(fp==NULL){
+		fputs("File error",stderr);
+		return 1;
+	}
+	fclose(fp);
+	
+	fp = fopen(argv[2], "r");
+
+	if(fp == NULL){
+		fputs("file error", stderr);
+		return 1;
+	}
+	fclose(fp);	
 
 	clock_t startCPU,endCPU,startGPU,endGPU;
 	cudaError_t error = cudaSuccess;
 	int *A,*B,*C; //A[filA][colA],B[filB][colB],C[filA][colB]
 	int *d_A,*d_B,*d_C,*h_C;
 	//int filA=2048,colA=2048,filB=2048,colB=2048;
-	int filA=1024,colA=1024,filB=1024,colB=1024;
+	//int filA=1024,colA=1024,filB=1024,colB=1024;
 	//-------------------------------CPU--------------------------------------------------------------------
-	A=(int*)malloc(filA*colA*sizeof(int));
-	B=(int*)malloc(filB*colB*sizeof(int));
-	C=(int*)malloc(filA*colB*sizeof(int));
 
-	inicializa(A,filA,colA);
-	inicializa(B,filB,colB);
+	//inicializa(A,filA,colA);
+	//inicializa(B,filB,colB);
+
+	//archivos csv
+
+	int filA = Detected_rows(fp, argv[1]);
+	int colA = Detected_columns(fp, argv[1]);
+	int filB = Detected_rows(fp, argv[2]);
+	int colB = Detected_columns(fp, argv[2]);
+
+	A=(int*)malloc(filA*colA*sizeof(int));
+        B=(int*)malloc(filB*colB*sizeof(int));
+        C=(int*)malloc(filA*colB*sizeof(int));
+
+	ExtracData(fp, A, argv[1], filA, colA);
+	ExtracData(fp, B, argv[2], filB, colB);
+
+	imprime(A,filA,colA);
+	printf("\n");
+	imprime(B, filB, colB);
 
 	if(colA==filB){//para que sean multiplicables
 		startCPU = clock();

@@ -51,6 +51,24 @@ void ExtracData(FILE *fp,float *M ,char nombre[], int Rows, int Columns){
 
 }
 
+void ExtracData(FILE *fp,int *M ,char nombre[], int Rows, int Columns){
+
+        fp = fopen(nombre,"r");
+        char cadena[N];
+        char *tok;
+
+        for(int i = 0; i < Rows; i++){
+                fscanf(fp,"%s",cadena);
+                tok = strtok(cadena, ";");
+                for(int j = 0; j < Columns; j++){
+                        M[i * Columns + j] = atoi(tok);
+                        tok = strtok(NULL, ";");
+                }
+        }
+        fclose(fp);
+
+}
+
 void printMatriz(float *Matriz, int f, int c){
 	for(int i = 0; i < f; i++){
 		for(int j = 0; j < c; j++){
