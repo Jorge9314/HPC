@@ -1,7 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 
-void EscribirArchivo(float **Matriz,char nombre[], int N, int M){
+void EscribirArchivo(int **Matriz,char nombre[], int N, int M){
 
 	FILE *fp;
 	fp = fopen (nombre,"w");
@@ -33,9 +33,9 @@ int main(int argc, char *argv[]){
 	int M = atoi(argv[3]);
 	int Num = atoi(argv[4]);
 
-	float  **matriz;
+	int  **matriz;
 
-	matriz = (float**)malloc(N * sizeof(float*));
+	matriz = (int**)malloc(N * sizeof(int*));
 
 	if(matriz == NULL){
 		printf("Error reservando memoria!");
@@ -43,7 +43,7 @@ int main(int argc, char *argv[]){
 	}
 
 	for(int i = 0; i < N; i++){
-		matriz[i] = (float*)malloc(M*sizeof(float*));
+		matriz[i] = (int*)malloc(M*sizeof(int*));
 		if(matriz[i] == NULL){
 			printf("Error de reserva de memoria");
 			return 1;
@@ -52,11 +52,9 @@ int main(int argc, char *argv[]){
 
 	printf("llenando matrizes... \n");
 
-	float a = Num / 1.0;
-
 	for(int i = 0; i < N; i++){
 		for(int j = 0; j < M; j++){
-			//float num = ((float)rand()/(float)(RAND_MAX)*a);
+
 			int num = rand() % Num;
 			matriz[i][j] = num;
 		}
