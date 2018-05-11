@@ -152,10 +152,6 @@ int main(int argc, char *argv[]){
 	ExtracData(fp, A, argv[1], filA, colA);
 	ExtracData(fp, B, argv[2], filB, colB);
 
-	imprime(A,filA,colA);
-	printf("\n");
-	imprime(B, filB, colB);
-
 	if(colA==filB){//para que sean multiplicables
 		startCPU = clock();
 		multiplicaMatrices(A,filA,colA,B,filB,colB,C);
