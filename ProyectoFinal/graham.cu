@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include <cuda.h>
+
 using namespace std;
 
 struct Point {
@@ -232,11 +233,18 @@ __host__ void convexHull(Point *h_points, int n){
 
 // Driver program to test above functions
 int main() {
-  uint n = 9;
+  int n;
+  cin >> n;
+  //uint n = 9;
   size_t size = n*sizeof(Point);
   Point *h_points = NULL;
   h_points = (Point *) malloc(size);
 
+  for(int i=0; i<n; i++){
+    cin >> h_points[i].x;
+    cin >> h_points[i].y; 
+  }
+  /*
   if(h_points != NULL){
     h_points[0].x = 0; h_points[0].y = 3;
     h_points[1].x = 1; h_points[1].y = 1;
@@ -249,7 +257,8 @@ int main() {
     h_points[8].x = 2; h_points[8].y = 1;
     convexHull(h_points, n);
   }
-
+  */
+  convexHull(h_points, n);
   if(h_points != NULL) free(h_points);
   return 0;
 }
