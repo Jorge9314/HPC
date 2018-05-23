@@ -216,11 +216,11 @@ __host__ void convexHull(Point *h_points, int n){
         S.pop();
       S.push(h_result[i]);
     }
-
+    cout << S.size() << endl;
     // Now stack has the output points, print contents of stack
     while(!S.empty()){
       Point p = S.top();
-      cout << "(" << p.x << ", " << p.y <<")" << endl;
+      cout << p.x << " " << p.y << endl;
       S.pop();
     }
 
