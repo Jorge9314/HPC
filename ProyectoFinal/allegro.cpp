@@ -9,6 +9,7 @@ using namespace std;
 
 #define VENTANA_X 800 
 #define VENTANA_Y 600
+#define ESCALA 1000
 #define NEGRO al_map_rgb(0,0,0)
 #define BLANCO al_map_rgb(255,255,255)
 #define AZUL al_map_rgb(0,0,255) 
@@ -56,17 +57,28 @@ void colorearPantalla(){
 
 void Puntos(Point v[], int Columnas, int tope){
     for(int i = 0; i < tope; i++){
-        al_draw_filled_circle(v[i].x+10, VENTANA_Y-v[i].y-10, 2.0, ROJO); // Crear un círculo: x = 200px, y = 160px, radio = 130px, color
+        int x = v[i].x * (VENTANA_X-10) / ESCALA; // escalonamiento
+        int y = v[i].y * (VENTANA_Y-10) / ESCALA;
+        al_draw_filled_circle(x+10, VENTANA_Y-y-10, 2.0, ROJO);
         //printf("filas: %d, columnas: %d\n", v[i]+10, VENTANA_Y-v[i+Columnas]-10);
     }
 }
 
 void Lines(Point v[], int Columnas, int tope){
 
-    al_draw_line(v[Columnas-1].x+10,VENTANA_Y-v[Columnas-1].y-10, v[0].x+10,VENTANA_Y-v[0].y-10, NEGRO, 1.0);
+    int tmpx1 = v[Columnas-1].x * (VENTANA_X-10) / ESCALA;
+    int tmpy1 = v[Columnas-1].y * (VENTANA_Y-10) / ESCALA;
+    int tmpx2 = v[0].x * (VENTANA_X-10) / ESCALA;
+    int tmpy2 = v[0].y * (VENTANA_Y-10) / ESCALA;
+
+    al_draw_line(tmpx1+10,VENTANA_Y-tmpy1-10, tmpx2+10,VENTANA_Y-tmpy2-10, NEGRO, 1.0);
 
     for(int i = 0; i < tope; i++){
-        al_draw_line(v[i].x+10, VENTANA_Y-v[i].y-10, v[i+1].x+10, VENTANA_Y-v[i+1].y-10, NEGRO, 1.0);
+        int x1 = v[i].x * (VENTANA_X-10) / ESCALA;
+        int y1 = v[i].y * (VENTANA_Y-10) / ESCALA;
+        int x2 = v[i+1].x * (VENTANA_X-10) / ESCALA;
+        int y2 = v[i+1].y * (VENTANA_Y-10) / ESCALA;
+        al_draw_line(x1+10, VENTANA_Y-y1-10, x2+10, VENTANA_Y-y2-10, NEGRO, 1.0);
     }
 }
 
@@ -111,14 +123,13 @@ void Graficar(Point vp[], int cp, Point vl[], int cl){
         colorearPantalla();
         tabla();
         Puntos(vp,cp,i);
-        //Lines(vl,cl);
-        al_flip_display(); // Dibujar en pantalla todo lo almacenado en el buffer
+        al_flip_display();
         i++;
     }
 
     printf("finish points\n");
     i = 0;
-
+    
     while(i < cl){
         colorearPantalla();
         tabla();
@@ -128,7 +139,7 @@ void Graficar(Point vp[], int cp, Point vl[], int cl){
         sleep(1); // retardo de 2 segundos
         i++;
     }
-
+    
     printf("finsh lines...\n");
     sleep(4);
     finalizar(); 
