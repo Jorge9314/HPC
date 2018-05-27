@@ -113,7 +113,6 @@ void Graficar(Point vp[], int cp, Point vl[], int cl){
         Puntos(vp,cp,i);
         //Lines(vl,cl);
         al_flip_display(); // Dibujar en pantalla todo lo almacenado en el buffer
-        sleep(1); // retardo de 2 segundos
         i++;
     }
 
