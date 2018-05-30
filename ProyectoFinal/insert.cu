@@ -9,10 +9,12 @@ __global__ void insert(int *a, int t){
 	int i = blockIdx.x*blockDim.x+threadIdx.x;
 
 	if(i < t-1){
-		if(a[i] > a[i+1]){
-			int aux = a[i];
-			a[i] = a[i+1];
-			a[i+1] = aux;
+		for(int k = 0; k < t-1; k++){
+			if(a[k] > a[k+1]){
+				int aux = a[k];
+				a[k] = a[k+1];
+				a[k+1] = aux;
+			}
 		}
 	}
 
@@ -21,16 +23,15 @@ __global__ void insert(int *a, int t){
 void cuda(int *a, int n){
 
 	int *array;
-	int blockSize = 32;
 
 	array = (int*)malloc(n * sizeof(int));
 	cudaMemcpy(array,a,n*sizeof(int),cudaMemcpyHostToDevice);
 
-    dim3 dimBlock(blockSize, 1, 1);
-    dim3 dimGrid(ceil(n / float(blockSize)), 1, 1);
-    insert<<<dimGrid,dimBlock>>>(array,n);
+	insert<<<1024,1>>>(array,n);
 
-    cudaMemcpy(a,array,n*sizeof(int),cudaMemcpyDeviceToHost);
+	cudaMemcpy(a,array,n*sizeof(int),cudaMemcpyDeviceToHost);
+
+	free(array);
 
 }
 
@@ -45,17 +46,12 @@ int main(){
 		cin >> a[i];
 	}
 
-	for(int i = 0; i < n; i++){
-		printf("%d\n", a[i]);
-	}
-	printf("\n\n", );
-
 	cuda(a,n);
 
 	for(int i = 0; i < n; i++){
-		printf("%d\n", a[i]);
+		cout << a[i] << " ";
 	}
-	printf("\n\n");
+	cout<<endl<<endl;
 
 	return 0;
 }
