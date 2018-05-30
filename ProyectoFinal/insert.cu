@@ -25,11 +25,11 @@ void cuda(int *a, int n){
 	int *array;
 
 	array = (int*)malloc(n * sizeof(int));
-	cudaMemcpy(array,a,n*sizeof(int),cudaMemcpyHostToDevice);
+	cudaMemcpy(array,a,n * sizeof(int),cudaMemcpyHostToDevice);
 
 	insert<<<1024,1>>>(array,n);
 
-	cudaMemcpy(a,array,n*sizeof(int),cudaMemcpyDeviceToHost);
+	cudaMemcpy(a,array,n * sizeof(int),cudaMemcpyDeviceToHost);
 
 	free(array);
 
