@@ -4,15 +4,6 @@
 #include<cuda.h>
 #include<sys/time.h>
 
-/**
- * mergesort.cu
- * a one-file c++ / cuda program for performing mergesort on the GPU
- * While the program execution is fairly slow, most of its runnning time
- *  is spent allocating memory on the GPU.
- * For a more complex program that performs many calculations,
- *  running on the GPU may provide a significant boost in performance
- */
-
 // helper for main()
 long readList(long**);
 
@@ -26,42 +17,6 @@ __device__ void gpu_bottomUpMerge(long*, long*, long, long, long);
 int tm();
 
 #define min(a, b) (a < b ? a : b)
-
-void printHelp(char* program) {
-
-    std::cout
-            << "usage: " << program << " [-xyzXYZv]\n"
-            << '\n'
-            << "-x, -y, -z are numbers of threads in each dimension. On my machine\n"
-            << "  the correct number is x*y*z = 32\n"
-            << '\n'
-            << "-X, -Y, -Z are numbers of blocks to use in each dimension. Each block\n"
-            << "  holds x*y*z threads, so the total number of threads is:\n"
-            << "  x*y*z*X*Y*Z\n"
-            << '\n'
-            << "-v prints out extra info\n"
-            << '\n'
-            << "? prints this message and exits\n"
-            << '\n'
-            << "example: ./mergesort -x 8 -Y 10 -v\n"
-            << '\n'
-            << "Reads in a list of integer numbers from stdin, and performs\n"
-            << "a bottom-up merge sort:\n"
-            << '\n'
-            << "Input:          8 3 1 9 1 2 7 5 9 3 6 4 2 0 2 5\n"
-            << "Threads: |    t1    |    t2    |    t3    |    t4    |\n"
-            << "         | 8 3 1 9  | 1 2 7 5  | 9 3 6 4  | 2 0 2 5  |\n"
-            << "         |  38 19   |  12 57   |  39 46   |  02 25   |\n"
-            << "         |   1398   |   1257   |   3469   |   0225   |\n"
-            << "         +----------+----------+----------+----------+\n"
-            << "         |          t1         |          t2         |\n"
-            << "         |       11235789      |       02234569      |\n"
-            << "         +---------------------+---------------------+\n"
-            << "         |                     t1                    |\n"
-            << "         |      0 1 1 2 2 2 3 3 4 5 5 6 7 8 9 9      |\n"
-            << '\n'
-            << '\n';
-}
 
 bool verbose;
 
@@ -110,7 +65,6 @@ int main(int argc, char** argv) {
                     break;
                 default:
                     std::cout << "unknown argument: " << arg << '\n';
-                    printHelp(argv[0]);
                     return -1;
             }
 
@@ -124,7 +78,6 @@ int main(int argc, char** argv) {
                 std::cout << "help:\n";
             else
                 std::cout << "invalid argument: " << argv[i] << '\n';
-            printHelp(argv[0]);
             return -1;
         }
     }
@@ -210,7 +163,7 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
      }
     error = cudaMalloc((void**) &D_blocks, sizeof(dim3));
     if(error != cudaSuccess){
-           std::cout<<"Error reservando memoria para D_blocks"<<std::endl;
+           std::cout<<"Error reservando memoria para D_blocks"<<std:: endl;
      }
     if (verbose)
         std::cout << "cudaMalloc device thread data: " << tm() << " microseconds\n";
