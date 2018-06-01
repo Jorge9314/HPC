@@ -74,17 +74,26 @@ __host__ void show(int* points,size_t n){
   printf("\n\n");
 }
 
-int main(int argc, char const *argv[]) {
-  size_t items = 2049;
+int main(){
+  
+  int items;
+  cin>>items;
+
   size_t size = items*sizeof(int);
   cudaError_t cudaState = cudaSuccess;
+
   int *h_points = NULL, *d_points = NULL, *h_result = NULL;
 
   h_points = (int*)malloc(size);
   h_result = (int*)malloc(size);
-  fill(h_points,items);
+
+  for(int i = 0; i < items; i++){
+    cin>>h_points;
+  }
+
   cudaState = cudaMalloc((void**)&d_points,size);
   checkCudaState(cudaState,"Impossible allocate data\n");
+
   if(d_points != NULL){
     cudaState = cudaMemcpy(d_points,h_points,size,cudaMemcpyHostToDevice);
     checkCudaState(cudaState,"Impossible copy data from host to device\n");

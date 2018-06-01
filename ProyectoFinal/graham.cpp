@@ -1,9 +1,11 @@
 // A C++ program to find convex hull of a set of points. Refer
 // http://www.geeksforgeeks.org/orientation-3-ordered-points/
 // for explanation of orientation()
+
 #include <iostream>
 #include <stack>
 #include <stdlib.h>
+
 using namespace std;
 
 struct Point
