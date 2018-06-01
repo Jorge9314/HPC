@@ -1,6 +1,8 @@
-#include <iostream>
-#include <cuda.h>
-#include <sys/time.h>
+#include<iostream>
+#include<stdio.h>
+#include<malloc.h>
+#include<cuda.h>
+#include<sys/time.h>
 
 /**
  * mergesort.cu
