@@ -22,7 +22,7 @@ bool verbose;
 
 int main(int argc, char** argv) {
     int size_all;
-    std::cin << size_all;
+    std::cin >> size_all;
     dim3 threadsPerBlock;
     dim3 blocksPerGrid;
 
