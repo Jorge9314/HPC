@@ -187,11 +187,11 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
     tm();
     error = cudaMalloc((void**) &D_data, size * sizeof(long));
     if(error != cudaSuccess){
-           cout<<"Error reservando memoria para D_data"<<endl;
+           std::cout<<"Error reservando memoria para D_data"<<std::endl;
      }
     error = cudaMalloc((void**) &D_swp, size * sizeof(long));
     if(error != cudaSuccess){
-           cout<<"Error reservando memoria para D_swp"<<endl;
+           std::cout<<"Error reservando memoria para D_swp"<<std::endl;
      }
     if (verbose)
         std::cout << "cudaMalloc device lists: " << tm() << " microseconds\n";
@@ -206,11 +206,11 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
     //
     error = cudaMalloc((void**) &D_threads, sizeof(dim3));
     if(error != cudaSuccess){
-           cout<<"Error reservando memoria para D_threads"<<endl;
+           std::cout<<"Error reservando memoria para D_threads"<<std::endl;
      }
     error = cudaMalloc((void**) &D_blocks, sizeof(dim3));
     if(error != cudaSuccess){
-           cout<<"Error reservando memoria para D_blocks"<<endl;
+           std::cout<<"Error reservando memoria para D_blocks"<<std::endl;
      }
     if (verbose)
         std::cout << "cudaMalloc device thread data: " << tm() << " microseconds\n";
