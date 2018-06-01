@@ -20,7 +20,6 @@ void mergesort(long*, long, dim3, dim3);
 __global__ void gpu_mergesort(long*, long*, long, long, long, dim3*, dim3*);
 __device__ void gpu_bottomUpMerge(long*, long*, long, long, long);
 
-
 // profiling
 int tm();
 
@@ -63,6 +62,7 @@ void printHelp(char* program) {
 }
 
 bool verbose;
+
 int main(int argc, char** argv) {
 
     dim3 threadsPerBlock;
@@ -180,29 +180,40 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
     long* D_swp;
     dim3* D_threads;
     dim3* D_blocks;
-
+    cudaError_t error = cudaSuccess;
     // Actually allocate the two arrays
     tm();
-    checkCudaErrors(cudaMalloc((void**) &D_data, size * sizeof(long)));
-    checkCudaErrors(cudaMalloc((void**) &D_swp, size * sizeof(long)));
+    error = cudaMalloc((void**) &D_data, size * sizeof(long));
+    if(error != cudaSuccess){
+           cout<<"Error reservando memoria para D_data"<<endl;
+     }
+    error = cudaMalloc((void**) &D_swp, size * sizeof(long));
+    if(error != cudaSuccess){
+           cout<<"Error reservando memoria para D_swp"<<endl;
+     }
     if (verbose)
         std::cout << "cudaMalloc device lists: " << tm() << " microseconds\n";
 
     // Copy from our input list into the first array
-    checkCudaErrors(cudaMemcpy(D_data, data, size * sizeof(long), cudaMemcpyHostToDevice));
+    cudaMemcpy(D_data, data, size * sizeof(long), cudaMemcpyHostToDevice);
     if (verbose)
         std::cout << "cudaMemcpy list to device: " << tm() << " microseconds\n";
 
     //
     // Copy the thread / block info to the GPU as well
     //
-    checkCudaErrors(cudaMalloc((void**) &D_threads, sizeof(dim3)));
-    checkCudaErrors(cudaMalloc((void**) &D_blocks, sizeof(dim3)));
-
+    error = cudaMalloc((void**) &D_threads, sizeof(dim3));
+    if(error != cudaSuccess){
+           cout<<"Error reservando memoria para D_threads"<<endl;
+     }
+    error = cudaMalloc((void**) &D_blocks, sizeof(dim3));
+    if(error != cudaSuccess){
+           cout<<"Error reservando memoria para D_blocks"<<endl;
+     }
     if (verbose)
         std::cout << "cudaMalloc device thread data: " << tm() << " microseconds\n";
-    checkCudaErrors(cudaMemcpy(D_threads, &threadsPerBlock, sizeof(dim3), cudaMemcpyHostToDevice));
-    checkCudaErrors(cudaMemcpy(D_blocks, &blocksPerGrid, sizeof(dim3), cudaMemcpyHostToDevice));
+    cudaMemcpy(D_threads, &threadsPerBlock, sizeof(dim3), cudaMemcpyHostToDevice);
+    cudaMemcpy(D_blocks, &blocksPerGrid, sizeof(dim3), cudaMemcpyHostToDevice);
 
     if (verbose)
         std::cout << "cudaMemcpy thread data to device: " << tm() << " microseconds\n";
@@ -242,14 +253,14 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
     // Get the list back from the GPU
     //
     tm();
-    checkCudaErrors(cudaMemcpy(data, A, size * sizeof(long), cudaMemcpyDeviceToHost));
+    cudaMemcpy(data, A, size * sizeof(long), cudaMemcpyDeviceToHost);
     if (verbose)
         std::cout << "cudaMemcpy list back to host: " << tm() << " microseconds\n";
 
 
     // Free the GPU memory
-    checkCudaErrors(cudaFree(A));
-    checkCudaErrors(cudaFree(B));
+    cudaFree(A);
+    cudaFree(B);
     if (verbose)
         std::cout << "cudaFree: " << tm() << " microseconds\n";
 }
