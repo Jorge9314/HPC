@@ -6,7 +6,9 @@
 #include <stack>
 #include <stdlib.h>
 #include <cuda.h>
-#include "mergeCuda.cu"
+#include <stdio.h>
+#include <malloc.h>
+#include <sys/time.h>
 
 using namespace std;
 
@@ -15,9 +17,12 @@ struct Point
     int x, y;
 };
 
+#define min(a, b) (a < b ? a : b)
+
 // A globle point needed for  sorting points with reference
 // to  the first point Used in compare function of qsort()
 Point p0;
+bool verbose;
 
 // A utility function to find next to top in a stack
 Point nextToTop(stack<Point> &S)
@@ -27,6 +32,66 @@ Point nextToTop(stack<Point> &S)
     Point res = S.top();
     S.push(p);
     return res;
+}
+
+// merge sort
+
+timeval tStart;
+int tm() {
+    timeval tEnd;
+    gettimeofday(&tEnd, 0);
+    int t = (tEnd.tv_sec - tStart.tv_sec) * 1000000 + tEnd.tv_usec - tStart.tv_usec;
+    tStart = tEnd;
+    return t;
+}
+
+//merge sort
+__device__ unsigned int getIdx(dim3* threads, dim3* blocks) {
+    int x;
+    return threadIdx.x +
+           threadIdx.y * (x  = threads->x) +
+           threadIdx.z * (x *= threads->y) +
+           blockIdx.x  * (x *= threads->z) +
+           blockIdx.y  * (x *= blocks->z) +
+           blockIdx.z  * (x *= blocks->y);
+}
+
+//
+// Perform a full mergesort on our section of the data.
+//
+__global__ void gpu_mergesort(long* source, long* dest, long size, long width, long slices, dim3* threads, dim3* blocks) {
+    unsigned int idx = getIdx(threads, blocks);
+    long start = width*idx*slices,
+         middle,
+         end;
+
+    for (long slice = 0; slice < slices; slice++) {
+        if (start >= size)
+            break;
+
+        middle = min(start + (width >> 1), size);
+        end = min(start + width, size);
+        gpu_bottomUpMerge(source, dest, start, middle, end);
+        start += width;
+    }
+}
+
+//
+// Finally, sort something
+// gets called by gpu_mergesort() for each slice
+//
+__device__ void gpu_bottomUpMerge(long* source, long* dest, long start, long middle, long end) {
+    long i = start;
+    long j = middle;
+    for (long k = start; k < end; k++) {
+        if (i < middle && (j >= end || source[i] < source[j])) {
+            dest[k] = source[i];
+            i++;
+        } else {
+            dest[k] = source[j];
+            j++;
+        }
+    }
 }
 
 //mergesortCuda
