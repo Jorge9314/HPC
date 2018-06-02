@@ -93,10 +93,6 @@ void mainMergeSortCuda(long *v, long n){
     long* data;
     long size = n;
     data = v;
-    if (!size) return -1;
-
-    if (verbose)
-        std::cout << "sorting " << size << " numbers\n\n";
 
     // merge-sort the data
     mergesort(data, size, threadsPerBlock, blocksPerGrid);
