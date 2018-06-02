@@ -152,7 +152,7 @@ void convexHull(Point points[], int n)
 
    cout<<"ordenando distancias"<<endl;
 
-   mainMergeSortCuda(distance, size);
+   //mainMergeSortCuda(distance, size);
 
    for(int i = 0; i < n-1; i++){
       cout<<"["<<distance[i]<<"]"<<endl;
