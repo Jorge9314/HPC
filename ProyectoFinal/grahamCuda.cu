@@ -88,71 +88,6 @@ void mainMergeSortCuda(long *v, long n){
     blocksPerGrid.z = 1;
 
     //
-    // Parse argv
-    //
-    tm();
-    for (int i = 1; i < argc; i++) {
-        if (argv[i][0] == '-' && argv[i][1] && !argv[i][2]) {
-            char arg = argv[i][1];
-            unsigned int* toSet = 0;
-            switch(arg) {
-                case 'x':
-                    toSet = &threadsPerBlock.x;
-                    break;
-                case 'y':
-                    toSet = &threadsPerBlock.y;
-                    break;
-                case 'z':
-                    toSet = &threadsPerBlock.z;
-                    break;
-                case 'X':
-                    toSet = &blocksPerGrid.x;
-                    break;
-                case 'Y':
-                    toSet = &blocksPerGrid.y;
-                    break;
-                case 'Z':
-                    toSet = &blocksPerGrid.z;
-                    break;
-                case 'v':
-                    verbose = true;
-                    break;
-                default:
-                    std::cout << "unknown argument: " << arg << '\n';
-                    return -1;
-            }
-
-            if (toSet) {
-                i++;
-                *toSet = (unsigned int) strtol(argv[i], 0, 10);
-            }
-        }
-        else {
-            if (argv[i][0] == '?' && !argv[i][1])
-                std::cout << "help:\n";
-            else
-                std::cout << "invalid argument: " << argv[i] << '\n';
-            return -1;
-        }
-    }
-
-    if (verbose) {
-        std::cout << "parse argv " << tm() << " microseconds\n";
-        std::cout << "\nthreadsPerBlock:"
-                  << "\n  x: " << threadsPerBlock.x
-                  << "\n  y: " << threadsPerBlock.y
-                  << "\n  z: " << threadsPerBlock.z
-                  << "\n\nblocksPerGrid:"
-                  << "\n  x:" << blocksPerGrid.x
-                  << "\n  y:" << blocksPerGrid.y
-                  << "\n  z:" << blocksPerGrid.z
-                  << "\n\n total threads: "
-                  << threadsPerBlock.x * threadsPerBlock.y * threadsPerBlock.z *
-                     blocksPerGrid.x * blocksPerGrid.y * blocksPerGrid.z
-                  << "\n\n";
-    }
-
-    //
     // Read numbers from stdin
     //
     long* data;
@@ -166,17 +101,11 @@ void mainMergeSortCuda(long *v, long n){
     // merge-sort the data
     mergesort(data, size, threadsPerBlock, blocksPerGrid);
 
-    tm();
-
     //
     // Print out the list
     //
     for (int i = 0; i < size; i++) {
         std::cout << data[i] << '\n';
-    }
-
-    if (verbose) {
-        std::cout << "print list to stdout: " << tm() << " microseconds\n";
     }
 }
 
