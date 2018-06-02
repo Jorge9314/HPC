@@ -19,7 +19,7 @@ int tm();
 #define min(a, b) (a < b ? a : b)
 
 bool verbose;
-/*
+
 int main(int argc, char** argv) {
     int size_all;
     std::cin >> size_all;
@@ -125,8 +125,6 @@ int main(int argc, char** argv) {
         std::cout << "print list to stdout: " << tm() << " microseconds\n";
     }
 }
-
-*/
 
 void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) {
 
