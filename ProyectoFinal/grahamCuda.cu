@@ -92,9 +92,9 @@ void mainMergeSortCuda(long *v, long n){
     //
     long* data;
     long size = n;
+    data = v;
     
     for(int i = 0; i < n; i++){
-      data[i] = v[i];
       cout<<data[i]<<endl;
     }
 
