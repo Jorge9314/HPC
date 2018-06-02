@@ -95,7 +95,7 @@ void mainMergeSortCuda(long *v, long n){
     data = v;
 
     // merge-sort the data
-    //mergesort(data, size, threadsPerBlock, blocksPerGrid);
+    mergesort(data, size, threadsPerBlock, blocksPerGrid);
 
     //
     // Print out the list
@@ -140,7 +140,6 @@ void convexHull(Point points[], int n)
    //extract distances
    for(int i = 0; i < n-1; i++){
     distance[i] = distSq(p0,points[i+1]);
-    cout<<"("<<distance[i]<<")"<<endl;
    }
 
    long size = n-1;
