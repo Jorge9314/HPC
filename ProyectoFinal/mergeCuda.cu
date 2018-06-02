@@ -146,15 +146,18 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_data"<<std::endl;
      }
+    std::cout<<"pass 1"<<std::endl;
     error = cudaMalloc((void**) &D_swp, size * sizeof(long));
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_swp"<<std::endl;
      }
+    std::cout<<"pass 2"<<std::endl;
     if (verbose)
         std::cout << "cudaMalloc device lists: " << tm() << " microseconds\n";
 
     // Copy from our input list into the first array
     cudaMemcpy(D_data, data, size * sizeof(long), cudaMemcpyHostToDevice);
+    std::cout<<"copy 1"<<std::endl;
     if (verbose)
         std::cout << "cudaMemcpy list to device: " << tm() << " microseconds\n";
 
@@ -169,10 +172,15 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_blocks"<<std:: endl;
      }
+
+    std::cout<<"pass t and b"<<std::endl;
+
     if (verbose)
         std::cout << "cudaMalloc device thread data: " << tm() << " microseconds\n";
     cudaMemcpy(D_threads, &threadsPerBlock, sizeof(dim3), cudaMemcpyHostToDevice);
     cudaMemcpy(D_blocks, &blocksPerGrid, sizeof(dim3), cudaMemcpyHostToDevice);
+
+    std::cout<<"copy t and b"<<std::endl;
 
     if (verbose)
         std::cout << "cudaMemcpy thread data to device: " << tm() << " microseconds\n";
@@ -188,6 +196,7 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
     // bigger and bigger until the whole list is sorted
     //
     std::cout<<"antes del ciclo for extraño"<<std::endl;
+    
     for (int width = 2; width < (size << 1); width <<= 1) {
         long slices = size / ((nThreads) * width) + 1;
 

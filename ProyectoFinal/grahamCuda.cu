@@ -176,6 +176,7 @@ void convexHull(Point points[], int n)
        cout << p.x << " " << p.y << endl;
        S.pop();
    }
+   free(distance);
 }
 
 // Driver program to test above functions
