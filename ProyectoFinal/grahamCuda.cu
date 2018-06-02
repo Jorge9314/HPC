@@ -29,7 +29,7 @@ Point nextToTop(stack<Point> &S)
 }
 
 // A utility function to swap two points
-int swap(Point &p1, Point &p2)
+void swap(Point &p1, Point &p2)
 {
     Point temp = p1;
     p1 = p2;
@@ -97,7 +97,28 @@ void convexHull(Point points[], int n)
    // has larger polar angle (in counterclockwise
    // direction) than p1
    p0 = points[0];
-   qsort(&points[1], n-1, sizeof(Point), compare);
+
+
+   //qsort(&points[1], n-1, sizeof(Point), compare);
+
+   long *distance;
+   distance = (long*)malloc(n-1*sizeof(long));
+
+   //extract distances
+   for(int i = 1; i < n; i++){
+    distance[i] = distSq(p0,points[i]);
+    cout<<"("<<distances[i]<<")"<<endl;
+   }
+
+   long size = n;
+   dim3 dimBlock = (32,1,1);
+   dim3 dimGrid = (8,1,1);
+
+   mergesort(distances, size,dimBlock,dimGrid);
+
+   for(int i = 1; i < n; i++){
+      cout<<"["<<distances[i]<<"]"<<endl;
+   }
 
    // If two or more points make same angle with p0,
    // Remove all but the one that is farthest from p0
