@@ -57,6 +57,24 @@ __device__ unsigned int getIdx(dim3* threads, dim3* blocks) {
 }
 
 //
+// Finally, sort something
+// gets called by gpu_mergesort() for each slice
+//
+__device__ void gpu_bottomUpMerge(long* source, long* dest, long start, long middle, long end) {
+    long i = start;
+    long j = middle;
+    for (long k = start; k < end; k++) {
+        if (i < middle && (j >= end || source[i] < source[j])) {
+            dest[k] = source[i];
+            i++;
+        } else {
+            dest[k] = source[j];
+            j++;
+        }
+    }
+}
+
+//
 // Perform a full mergesort on our section of the data.
 //
 __global__ void gpu_mergesort(long* source, long* dest, long size, long width, long slices, dim3* threads, dim3* blocks) {
@@ -73,24 +91,6 @@ __global__ void gpu_mergesort(long* source, long* dest, long size, long width, l
         end = min(start + width, size);
         gpu_bottomUpMerge(source, dest, start, middle, end);
         start += width;
-    }
-}
-
-//
-// Finally, sort something
-// gets called by gpu_mergesort() for each slice
-//
-__device__ void gpu_bottomUpMerge(long* source, long* dest, long start, long middle, long end) {
-    long i = start;
-    long j = middle;
-    for (long k = start; k < end; k++) {
-        if (i < middle && (j >= end || source[i] < source[j])) {
-            dest[k] = source[i];
-            i++;
-        } else {
-            dest[k] = source[j];
-            j++;
-        }
     }
 }
 
