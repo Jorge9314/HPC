@@ -107,17 +107,17 @@ void convexHull(Point points[], int n)
    //extract distances
    for(int i = 1; i < n; i++){
     distance[i] = distSq(p0,points[i]);
-    cout<<"("<<distances[i]<<")"<<endl;
+    cout<<"("<<distance[i]<<")"<<endl;
    }
 
    long size = n;
    dim3 dimBlock = (32,1,1);
    dim3 dimGrid = (8,1,1);
 
-   mergesort(distances, size,dimBlock,dimGrid);
+   mergesort(distance, size,dimBlock,dimGrid);
 
    for(int i = 1; i < n; i++){
-      cout<<"["<<distances[i]<<"]"<<endl;
+      cout<<"["<<distance[i]<<"]"<<endl;
    }
 
    // If two or more points make same angle with p0,
