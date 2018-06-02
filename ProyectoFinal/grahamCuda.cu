@@ -93,10 +93,6 @@ void mainMergeSortCuda(long *v, long n){
     long* data;
     long size = n;
     data = v;
-    
-    for(int i = 0; i < n; i++){
-      cout<<data[i]<<endl;
-    }
 
     // merge-sort the data
     //mergesort(data, size, threadsPerBlock, blocksPerGrid);
