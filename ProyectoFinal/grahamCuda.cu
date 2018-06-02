@@ -101,6 +101,7 @@ void convexHull(Point points[], int n)
 
    //qsort(&points[1], n-1, sizeof(Point), compare);
 
+   cout << "sacando distancias"<<endl; 
    long *distance;
    distance = (long*)malloc(n-1*sizeof(long));
 
@@ -110,15 +111,19 @@ void convexHull(Point points[], int n)
     cout<<"("<<distance[i]<<")"<<endl;
    }
 
-   long size = n;
+   long size = (long)n;
    dim3 dimBlock = (32,1,1);
    dim3 dimGrid = (8,1,1);
+
+   cout<<"ordenando distancias"<<endl;
 
    mergesort(distance, size,dimBlock,dimGrid);
 
    for(int i = 1; i < n; i++){
       cout<<"["<<distance[i]<<"]"<<endl;
    }
+
+   cout<<"datos ordenados"<<endl;
 
    // If two or more points make same angle with p0,
    // Remove all but the one that is farthest from p0
