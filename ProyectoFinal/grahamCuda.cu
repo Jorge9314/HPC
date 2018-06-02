@@ -74,6 +74,112 @@ int compare(const void *vp1, const void *vp2)
    return (o == 2)? -1: 1;
 }
 
+void mainMergeSortCuda(long *v, long n){
+
+    dim3 threadsPerBlock;
+    dim3 blocksPerGrid;
+
+    threadsPerBlock.x = 32;
+    threadsPerBlock.y = 1;
+    threadsPerBlock.z = 1;
+
+    blocksPerGrid.x = 8;
+    blocksPerGrid.y = 1;
+    blocksPerGrid.z = 1;
+
+    //
+    // Parse argv
+    //
+    tm();
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-' && argv[i][1] && !argv[i][2]) {
+            char arg = argv[i][1];
+            unsigned int* toSet = 0;
+            switch(arg) {
+                case 'x':
+                    toSet = &threadsPerBlock.x;
+                    break;
+                case 'y':
+                    toSet = &threadsPerBlock.y;
+                    break;
+                case 'z':
+                    toSet = &threadsPerBlock.z;
+                    break;
+                case 'X':
+                    toSet = &blocksPerGrid.x;
+                    break;
+                case 'Y':
+                    toSet = &blocksPerGrid.y;
+                    break;
+                case 'Z':
+                    toSet = &blocksPerGrid.z;
+                    break;
+                case 'v':
+                    verbose = true;
+                    break;
+                default:
+                    std::cout << "unknown argument: " << arg << '\n';
+                    return -1;
+            }
+
+            if (toSet) {
+                i++;
+                *toSet = (unsigned int) strtol(argv[i], 0, 10);
+            }
+        }
+        else {
+            if (argv[i][0] == '?' && !argv[i][1])
+                std::cout << "help:\n";
+            else
+                std::cout << "invalid argument: " << argv[i] << '\n';
+            return -1;
+        }
+    }
+
+    if (verbose) {
+        std::cout << "parse argv " << tm() << " microseconds\n";
+        std::cout << "\nthreadsPerBlock:"
+                  << "\n  x: " << threadsPerBlock.x
+                  << "\n  y: " << threadsPerBlock.y
+                  << "\n  z: " << threadsPerBlock.z
+                  << "\n\nblocksPerGrid:"
+                  << "\n  x:" << blocksPerGrid.x
+                  << "\n  y:" << blocksPerGrid.y
+                  << "\n  z:" << blocksPerGrid.z
+                  << "\n\n total threads: "
+                  << threadsPerBlock.x * threadsPerBlock.y * threadsPerBlock.z *
+                     blocksPerGrid.x * blocksPerGrid.y * blocksPerGrid.z
+                  << "\n\n";
+    }
+
+    //
+    // Read numbers from stdin
+    //
+    long* data;
+    long size = n;
+    data = v;
+    if (!size) return -1;
+
+    if (verbose)
+        std::cout << "sorting " << size << " numbers\n\n";
+
+    // merge-sort the data
+    mergesort(data, size, threadsPerBlock, blocksPerGrid);
+
+    tm();
+
+    //
+    // Print out the list
+    //
+    for (int i = 0; i < size; i++) {
+        std::cout << data[i] << '\n';
+    }
+
+    if (verbose) {
+        std::cout << "print list to stdout: " << tm() << " microseconds\n";
+    }
+}
+
 // Prints convex hull of a set of n points.
 void convexHull(Point points[], int n)
 {
@@ -118,7 +224,7 @@ void convexHull(Point points[], int n)
 
    cout<<"ordenando distancias"<<endl;
 
-   mergesort(distance, size,dimBlock,dimGrid);
+   mainMergeSortCuda(distance, size);
 
    for(int i = 0; i < n-1; i++){
       cout<<"["<<distance[i]<<"]"<<endl;
