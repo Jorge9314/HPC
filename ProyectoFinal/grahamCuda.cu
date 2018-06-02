@@ -98,7 +98,7 @@ void mainMergeSortCuda(long *v, long n){
     }
 
     // merge-sort the data
-    mergesort(data, size, threadsPerBlock, blocksPerGrid);
+    //mergesort(data, size, threadsPerBlock, blocksPerGrid);
 
     //
     // Print out the list
