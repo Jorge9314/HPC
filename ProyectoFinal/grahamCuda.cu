@@ -98,7 +98,7 @@ void convexHull(Point points[], int n)
    // has larger polar angle (in counterclockwise
    // direction) than p1
    p0 = points[0];
-
+   cout<<points[0].x<<" "<<points[0].y<<endl;
 
    //qsort(&points[1], n-1, sizeof(Point), compare);
 
