@@ -197,7 +197,9 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
         }
 
         // Actually call the kernel
+        cout<< "llamando a a GPU"<<endl;
         gpu_mergesort<<<blocksPerGrid, threadsPerBlock>>>(A, B, size, width, slices, D_threads, D_blocks);
+        cout<< "saliendo de la GPU"<<endl;
 
         if (verbose)
             std::cout << "call mergesort kernel: " << tm() << " microseconds\n";
