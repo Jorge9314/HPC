@@ -140,8 +140,8 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
     dim3* D_blocks;
     cudaError_t error = cudaSuccess;
     // Actually allocate the two arrays
-    std::cout<<"reservando memoria con cudamalloc"<<std::endl;
     tm();
+    std::cout<<"reservando memoria con cudamalloc"<<std::endl;
     error = cudaMalloc((void**) &D_data, size * sizeof(long));
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_data"<<std::endl;
@@ -196,7 +196,7 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
     // bigger and bigger until the whole list is sorted
     //
     std::cout<<"antes del ciclo for extraño"<<std::endl;
-    
+
     for (int width = 2; width < (size << 1); width <<= 1) {
         long slices = size / ((nThreads) * width) + 1;
 
