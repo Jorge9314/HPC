@@ -107,12 +107,12 @@ void convexHull(Point points[], int n)
    distance = (long*)malloc(n-1*sizeof(long));
 
    //extract distances
-   for(int i = 1; i < n; i++){
+   for(int i = 0; i < n-1; i++){
     distance[i] = distSq(p0,points[i]);
     cout<<"("<<distance[i]<<")"<<endl;
    }
 
-   long size = (long)n;
+   long size = n;
    dim3 dimBlock(32,1,1);
    dim3 dimGrid(8,1,1);
 
@@ -120,7 +120,7 @@ void convexHull(Point points[], int n)
 
    mergesort(distance, size,dimBlock,dimGrid);
 
-   for(int i = 1; i < n; i++){
+   for(int i = 0; i < n-1; i++){
       cout<<"["<<distance[i]<<"]"<<endl;
    }
 
