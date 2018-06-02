@@ -92,7 +92,7 @@ void mainMergeSortCuda(long *v, long n){
     //
     long* data;
     long size = n;
-    data = &v;
+    data = *v;
 
     // merge-sort the data
     mergesort(data, size, threadsPerBlock, blocksPerGrid);
