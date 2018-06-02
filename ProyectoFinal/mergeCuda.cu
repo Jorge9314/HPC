@@ -187,7 +187,7 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
     // Slice up the list and give pieces of it to each thread, letting the pieces grow
     // bigger and bigger until the whole list is sorted
     //
-    cout<<"antes del ciclo for extraño"
+    std::cout<<"antes del ciclo for extraño"<<std::endl;
     for (int width = 2; width < (size << 1); width <<= 1) {
         long slices = size / ((nThreads) * width) + 1;
 
