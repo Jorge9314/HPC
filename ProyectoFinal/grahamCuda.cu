@@ -108,7 +108,7 @@ void convexHull(Point points[], int n)
 
    //extract distances
    for(int i = 0; i < n-1; i++){
-    distance[i] = distSq(p0,points[i]);
+    distance[i] = distSq(p0,points[i+1]);
     cout<<"("<<distance[i]<<")"<<endl;
    }
 
