@@ -112,7 +112,7 @@ void convexHull(Point points[], int n)
     cout<<"("<<distance[i]<<")"<<endl;
    }
 
-   long size = n;
+   long size = n-1;
    dim3 dimBlock(32,1,1);
    dim3 dimGrid(8,1,1);
 
