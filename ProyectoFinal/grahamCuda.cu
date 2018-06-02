@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stack>
 #include <stdlib.h>
+#include <cuda.h>
 #include "mergeCuda.cu"
 
 using namespace std;

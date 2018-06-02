@@ -1,8 +1,8 @@
-#include<iostream>
-#include<stdio.h>
-#include<malloc.h>
-#include<cuda.h>
-#include<sys/time.h>
+#include <iostream>
+#include <stdio.h>
+#include <malloc.h>
+#include <cuda.h>
+#include <sys/time.h>
 
 // helper for main()
 long readList(long**);
