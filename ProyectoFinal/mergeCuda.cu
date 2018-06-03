@@ -115,10 +115,6 @@ void Cuda_main(Point points[], int n) {
     if (verbose)
         std::cout << "sorting " << size << " numbers\n\n";
 
-    for (int i = 0; i < size; i++) {
-        std::cout << data[i] << '\n';
-    }
-
     // merge-sort the data
     //mergesort(data, size, threadsPerBlock, blocksPerGrid);
 
@@ -127,10 +123,11 @@ void Cuda_main(Point points[], int n) {
     //
     // Print out the list
     //
+    /*
     for (int i = 0; i < size; i++) {
         std::cout << data[i] << '\n';
     }
-
+    */
     if (verbose) {
         std::cout << "print list to stdout: " << tm() << " microseconds\n";
     }
