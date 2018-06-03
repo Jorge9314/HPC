@@ -5,7 +5,7 @@
 #include <iostream>
 #include <stack>
 #include <stdlib.h>
-#include "mergeCuda.cu"
+#include "mergesort.cu"
 
 using namespace std;
 
