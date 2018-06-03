@@ -25,9 +25,8 @@ struct Point
     int x, y;
 };
 
-int Cuda_main(Point points[], int size) {
-    int size_all;
-    std::cin >> size_all;
+int Cuda_main(Point points[], int n) {
+    
     dim3 threadsPerBlock;
     dim3 blocksPerGrid;
 
@@ -109,8 +108,7 @@ int Cuda_main(Point points[], int size) {
     // Read numbers from stdin
     //
     long* data;
-    long size = readList(&data);
-    if (!size) return -1;
+    long size = readList(&data,points,n);
 
     if (verbose)
         std::cout << "sorting " << size << " numbers\n\n";
@@ -302,12 +300,13 @@ typedef struct {
 
 // helper function for reading numbers from stdin
 // it's 'optimized' not to check validity of the characters it reads in..
-long readList(long** list) {
+long readList(long** list,Points point[],int s) {
     tm();
-    long v, size = 0;
+    Point v, 
+    long size = 0;
     LinkNode* node = 0;
     LinkNode* first = 0;
-    while (std::cin >> v) {
+    while (size < s) {
         LinkNode* next = new LinkNode();
         next->v = v;
         if (node)
