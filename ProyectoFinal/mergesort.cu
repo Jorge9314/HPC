@@ -367,8 +367,8 @@ int main(int argc, char *argv[]){
     }
 
     Point* p0;
-    p0.x = 300;
-    p0.y = 300;
+    &p0.x = 300;
+    &p0.y = 300;
 
     return Cuda_Main(argc,argv,p, n,p0);
 }
