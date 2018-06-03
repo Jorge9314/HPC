@@ -158,7 +158,7 @@ void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid,
 
     // Copy from our input list into the first array
     cudaMemcpy(D_data, data, size * sizeof(Point), cudaMemcpyHostToDevice);
-    std::cout<<"copy 1"<<std::endl;
+
     if (verbose)
         std::cout << "cudaMemcpy list to device: " << tm() << " microseconds\n";
 
