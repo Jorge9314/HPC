@@ -29,7 +29,7 @@ typedef struct {
 
 // helper function for reading numbers from stdin
 // it's 'optimized' not to check validity of the characters it reads in..
-long readList(Point* list, Point points[],int n) {
+long readList(Point* list,int n) {
     tm();
     Point v;
     long size = 0;
@@ -227,7 +227,7 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
         std::cout << "cudaFree: " << tm() << " microseconds\n";
 }
 
-int Cuda_Main(int argc, char *argv[], Point points, int tamanio) {
+int Cuda_Main(int argc, char *argv[], Point* points, int tamanio) {
     
     dim3 threadsPerBlock;
     dim3 blocksPerGrid;
@@ -309,8 +309,7 @@ int Cuda_Main(int argc, char *argv[], Point points, int tamanio) {
     //
     // Read numbers from stdin
     //
-    Point* data;
-    long size = readList(data,points,tamanio);
+    long size = readList(points,tamanio);
     if (!size) return -1;
 
     if (verbose)
@@ -335,12 +334,15 @@ int main(int argc, char *argv[]){
     std::cin >> n;
     std::cout << n << std::endl;
     Point points[n];
+    Point *p;
+    p = (Point*)malloc(n * sizeof(Point));
 
     for(int i = 0;  i < n; i++){
         std::cin >> points[i].x;
         std::cin >> points[i].y;
         std::cout << points[i].x << " " << points[i].y << std::endl;
+        p[i] = points[i];
     }
 
-    return Cuda_Main(argc,argv,points, n);
+    return Cuda_Main(argc,argv,p, n);
 }
