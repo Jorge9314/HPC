@@ -100,8 +100,8 @@ __device__ void gpu_bottomUpMerge(Point* source, Point* dest, long start, long m
     long i = start;
     long j = middle;
     for (long k = start; k < end; k++) {
-        if (i < middle && (j >= end || compare_cuda(*source[i],*source[j],&p0))) {
-            dest[k] = source[i];
+        if (i < middle && (j >= end || compare_cuda(source[i],source[j],p0))) {
+            dest[k] = source[i]
             i++;
         } else {
             dest[k] = source[j];
