@@ -320,7 +320,7 @@ int Cuda_Main(int argc, char *argv[], Point* points, int tamanio) {
         std::cout << "sorting " << size << " numbers\n\n";
 
     // merge-sort the data
-    mergesort(data, size, threadsPerBlock, blocksPerGrid);
+    mergesort(points, size, threadsPerBlock, blocksPerGrid);
 
     tm();
 
