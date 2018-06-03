@@ -74,7 +74,7 @@ __device__ int distSq_cuda(Point p1, Point p2){
           (p1.y - p2.y)*(p1.y - p2.y);
 }
 
-__device__ int orientation(Point p, Point q, Point r){
+__device__ int orientation_cuda(Point p, Point q, Point r){
     int val = (q.y - p.y) * (r.x - q.x) -
               (q.x - p.x) * (r.y - q.y);
 
@@ -82,15 +82,15 @@ __device__ int orientation(Point p, Point q, Point r){
     return (val > 0)? 1: 2; // clock or counterclock wise
 }
 
-__device__ bool compare(const void *vp1, const void *vp2, const void *p0){
+__device__ bool compare_cuda(const void *vp1, const void *vp2, const void *P0){
    Point *p1 = (Point *)vp1;
    Point *p2 = (Point *)vp2;
-   Point *p0 = (Point *)p0;
+   Point *p0 = (Point *)P0;
 
    // Find orientation
-   int o = orientation(p0, *p1, *p2);
+   int o = orientation_cuda(p0, *p1, *p2);
    if (o == 0)
-     return (distSq(p0, *p2) >= distSq(p0, *p1))? true : false;
+     return (distSq_cuda(p0, *p2) >= distSq_cuda(p0, *p1))? true : false;
 
    return (o == 2)? true : false;
 }
@@ -103,7 +103,7 @@ __device__ void gpu_bottomUpMerge(Point* source, Point* dest, long start, long m
     long i = start;
     long j = middle;
     for (long k = start; k < end; k++) {
-        if (i < middle && (j >= end || compare(source[i],source[j],p0))) {
+        if (i < middle && (j >= end || compare_cuda(source[i],source[j],p0))) {
             dest[k] = source[i];
             i++;
         } else {
