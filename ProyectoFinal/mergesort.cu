@@ -227,7 +227,7 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
         std::cout << "cudaFree: " << tm() << " microseconds\n";
 }
 
-void Cuda_Main(int argc, char *argv[], Point points, int tamanio) {
+int Cuda_Main(int argc, char *argv[], Point points, int tamanio) {
     
     dim3 threadsPerBlock;
     dim3 blocksPerGrid;
@@ -310,7 +310,7 @@ void Cuda_Main(int argc, char *argv[], Point points, int tamanio) {
     // Read numbers from stdin
     //
     Point* data;
-    long size = readList(&data,points,tamanio);
+    long size = readList(data,points,tamanio);
     if (!size) return -1;
 
     if (verbose)
@@ -342,6 +342,5 @@ int main(int argc, char *argv[]){
         std::cout << points[i].x << " " << points[i].y << std::endl;
     }
 
-    Cuda_Main(argc,argv,points, n);
-    return 0;
+    return Cuda_Main(argc,argv,points, n);
 }
