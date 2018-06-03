@@ -109,7 +109,7 @@ void Cuda_main(Point points[], int n) {
     //
     // Read numbers from stdin
     //
-    long* data;
+    Point* data;
     long size = readList(&data,points,n);
 
     if (verbose)
@@ -302,7 +302,7 @@ typedef struct {
 
 // helper function for reading numbers from stdin
 // it's 'optimized' not to check validity of the characters it reads in..
-long readList(long** list,Point points[],int s) {
+long readList(Point** list,Point points[],int s) {
     tm();
     Point v; 
     long size = 0;
