@@ -119,26 +119,26 @@ __global__ void gpu_mergesort(long* source, long* dest, long size, long width, l
     }
 }
 
-void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) {
+void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) {
 
     //
     // Allocate two arrays on the GPU
     // we switch back and forth between them during the sort
     //
-    long* D_data;
-    long* D_swp;
+    Point* D_data;
+    Point* D_swp;
     dim3* D_threads;
     dim3* D_blocks;
     cudaError_t error = cudaSuccess;
     // Actually allocate the two arrays
     tm();
     std::cout<<"reservando memoria con cudamalloc"<<std::endl;
-    error = cudaMalloc((void**) &D_data, size * sizeof(long));
+    error = cudaMalloc((void**) &D_data, size * sizeof(Point));
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_data"<<std::endl;
      }
     std::cout<<"pass 1"<<std::endl;
-    error = cudaMalloc((void**) &D_swp, size * sizeof(long));
+    error = cudaMalloc((void**) &D_swp, size * sizeof(Point));
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_swp"<<std::endl;
      }
@@ -147,7 +147,7 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
         std::cout << "cudaMalloc device lists: " << tm() << " microseconds\n";
 
     // Copy from our input list into the first array
-    cudaMemcpy(D_data, data, size * sizeof(long), cudaMemcpyHostToDevice);
+    cudaMemcpy(D_data, data, size * sizeof(Point), cudaMemcpyHostToDevice);
     std::cout<<"copy 1"<<std::endl;
     if (verbose)
         std::cout << "cudaMemcpy list to device: " << tm() << " microseconds\n";
@@ -176,8 +176,8 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
     if (verbose)
         std::cout << "cudaMemcpy thread data to device: " << tm() << " microseconds\n";
 
-    long* A = D_data;
-    long* B = D_swp;
+    Point* A = D_data;
+    Point* B = D_swp;
 
     long nThreads = threadsPerBlock.x * threadsPerBlock.y * threadsPerBlock.z *
                     blocksPerGrid.x * blocksPerGrid.y * blocksPerGrid.z;
@@ -200,7 +200,7 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
 
         // Actually call the kernel
         std::cout<< "llamando a a GPU"<<std::endl;
-        gpu_mergesort<<<blocksPerGrid, threadsPerBlock>>>(A, B, size, width, slices, D_threads, D_blocks);
+        //gpu_mergesort<<<blocksPerGrid, threadsPerBlock>>>(A, B, size, width, slices, D_threads, D_blocks);
         std::cout<< "saliendo de la GPU"<<std::endl;
 
         if (verbose)
@@ -215,7 +215,7 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
     // Get the list back from the GPU
     //
     tm();
-    cudaMemcpy(data, A, size * sizeof(long), cudaMemcpyDeviceToHost);
+    cudaMemcpy(data, A, size * sizeof(Point), cudaMemcpyDeviceToHost);
     if (verbose)
         std::cout << "cudaMemcpy list back to host: " << tm() << " microseconds\n";
 
@@ -320,7 +320,7 @@ int Cuda_Main(int argc, char *argv[], Point* points, int tamanio) {
         std::cout << "sorting " << size << " numbers\n\n";
 
     // merge-sort the data
-    //mergesort(data, size, threadsPerBlock, blocksPerGrid);
+    mergesort(data, size, threadsPerBlock, blocksPerGrid);
 
     tm();
 
