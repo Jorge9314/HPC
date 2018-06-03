@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stack>
 #include <stdlib.h>
+#include "mergesort.cu"
 
 using namespace std;
 
@@ -73,7 +74,7 @@ int compare(const void *vp1, const void *vp2)
 }
 
 // Prints convex hull of a set of n points.
-void convexHull(Point points[], int n)
+void convexHull(int argc, char* argv[], Point points[], int n)
 {
    // Find the bottommost point
    int ymin = points[0].y, min = 0;
@@ -96,7 +97,19 @@ void convexHull(Point points[], int n)
    // has larger polar angle (in counterclockwise
    // direction) than p1
    p0 = points[0];
-   qsort(&points[1], n-1, sizeof(Point), compare);
+   //qsort(&points[1], n-1, sizeof(Point), compare);
+   Point* point;
+   point = (Point*)malloc(n * sizeof(Point));
+   Point* P0;
+   P0 = (Point*)malloc(sizeof(Point));
+   P0[0].x = p0.x;
+   P0[0].y = p0.y;
+
+   for (int i = 0; i < n; ++i){
+     point[i] = points[i];
+   }
+
+   Cuda_Main(int argc, char* argv[], point, n, P0);
 
    // If two or more points make same angle with p0,
    // Remove all but the one that is farthest from p0
@@ -151,7 +164,7 @@ void convexHull(Point points[], int n)
 }
 
 // Driver program to test above functions
-int main(){
+int main(int argc, char* argv[]){
 /*
   Point points[] = {{529, 928},
   {11, 143},
@@ -218,6 +231,6 @@ int main(){
         cout << points[i].x << " " << points[i].y << endl;
     }
 
-    convexHull(points, n);
+    convexHull(argc,argv,points, n);
     return 0;
 }
