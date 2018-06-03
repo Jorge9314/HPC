@@ -82,7 +82,7 @@ __device__ int orientation_cuda(Point p, Point q, Point r){
     return (val > 0)? 1: 2; // clock or counterclock wise
 }
 
-__device__ bool compare_cuda(Point *p1, Point *p2, Point *P0){
+__device__ bool compare_cuda(Point *p1, Point *p2, Point *p0){
 
    // Find orientation
    int o = orientation_cuda(p0, *p1, *p2);
@@ -100,7 +100,7 @@ __device__ void gpu_bottomUpMerge(Point* source, Point* dest, long start, long m
     long i = start;
     long j = middle;
     for (long k = start; k < end; k++) {
-        if (i < middle && (j >= end || compare_cuda(*source[i],*source[j],*p0))) {
+        if (i < middle && (j >= end || compare_cuda(*source[i],*source[j],&p0))) {
             dest[k] = source[i];
             i++;
         } else {
