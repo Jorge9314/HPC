@@ -22,15 +22,6 @@ struct Point
 
 Point p0;
 
-bool Point operator <(Point p1, Point p2){
-    int d_p1 = (p0.x - p1.x)*(p0.x - p1.x) + (p0.y - p1.y)*(p0.y - p1.y);
-    int d_p2 = (p0.x - p2.x)*(p0.x - p2.x) + (p0.y - p2.y)*(p0.y - p2.y);
-    if(d_p1 < d_p2){
-        return true;
-    }else{
-        return false;
-    }
-}
 // helper for main()
 
 typedef struct {
@@ -88,7 +79,11 @@ __device__ void gpu_bottomUpMerge(Point* source, Point* dest, long start, long m
     long i = start;
     long j = middle;
     for (long k = start; k < end; k++) {
-        if (i < middle && (j >= end || source[i] < source[j])) {
+        int i_source = (p0.x - source[i].x)*(p0.x - source[i].x) + 
+                       (p0.y - source[i].y)*(p0.y - source[i].y);
+        int j_source = (p0.x - source[j].x)*(p0.x - source[j].x) + 
+                       (p0.y - source[j].y)*(p0.y - source[j].y);
+        if (i < middle && (j >= end || i_source < j_source)) {
             dest[k] = source[i];
             i++;
         } else {
