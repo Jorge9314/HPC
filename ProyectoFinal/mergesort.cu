@@ -327,6 +327,7 @@ int Cuda_Main(int argc, char *argv[], Point* points, int tamanio) {
     if (verbose) {
         std::cout << "print list to stdout: " << tm() << " microseconds\n";
     }
+    return 0;
 }
 
 int main(int argc, char *argv[]){
