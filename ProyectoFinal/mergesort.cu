@@ -348,7 +348,7 @@ int Cuda_Main(int argc, char *argv[], Point* points, int tamanio, Point* p0) {
     }
     return 0;
 }
-
+/*
 int main(int argc, char *argv[]){
 
     int n;
@@ -372,4 +372,4 @@ int main(int argc, char *argv[]){
     p0[0].y = 300;
 
     return Cuda_Main(argc,argv,p, n,p0);
-}
+}*/

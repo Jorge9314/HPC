@@ -104,7 +104,7 @@ void convexHull(Point points[], int n)
      point[i] = points[i];
    }
 
-   Cuda_Main(int argc, char* argv[], point, n, P0);
+   Cuda_Main(argc, argv, point, n, P0);
 
    // If two or more points make same angle with p0,
    // Remove all but the one that is farthest from p0
