@@ -5,8 +5,6 @@
 #include <sys/time.h>
 #define min(a, b) (a < b ? a : b)
 
-unsing namespace std;
-
 bool verbose;
 timeval tStart;
 int tm() {
@@ -334,14 +332,14 @@ int Cuda_Main(int argc, char *argv[], Point points, int tamanio) {
 
 int main(int argc, char *argv[]){
     int n;
-    cin >> n;
-    cout << n << endl;
+    std::cin >> n;
+    std::cout << n << std::endl;
     Point points[n];
 
     for(int i = 0;  i < n; i++){
-        cin >> points[i].x;
-        cin >> points[i].y;
-        cout << points[i].x << " " << points[i].y << endl;
+        std::cin >> points[i].x;
+        std::cin >> points[i].y;
+        std::cout << points[i].x << " " << points[i].y << std::endl;
     }
 
     Cuda_Main(argc,argv,points, n);
