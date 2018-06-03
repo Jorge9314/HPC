@@ -312,6 +312,10 @@ int Cuda_Main(int argc, char *argv[], Point* points, int tamanio) {
     long size = readList(points,tamanio);
     if (!size) return -1;
 
+    for(int i = 0; i < tamanio; i++){
+        std::cout<<"("<<points[i].x<<","<<points[i].y<<")"<<std::endl;
+    }
+
     if (verbose)
         std::cout << "sorting " << size << " numbers\n\n";
 
