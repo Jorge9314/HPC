@@ -3,131 +3,119 @@
 #include <malloc.h>
 #include <cuda.h>
 #include <sys/time.h>
-
-// helper for main()
-long readList(long**);
-
-// data[], size, threads, blocks,
-void mergesort(long*, long, dim3, dim3);
-// A[]. B[], size, width, slices, nThreads
-__global__ void gpu_mergesort(long*, long*, long, long, long, dim3*, dim3*);
-__device__ void gpu_bottomUpMerge(long*, long*, long, long, long);
-
-// profiling
-int tm();
-
 #define min(a, b) (a < b ? a : b)
 
 bool verbose;
+timeval tStart;
+int tm() {
+    timeval tEnd;
+    gettimeofday(&tEnd, 0);
+    int t = (tEnd.tv_sec - tStart.tv_sec) * 1000000 + tEnd.tv_usec - tStart.tv_usec;
+    tStart = tEnd;
+    return t;
+}
 
-int main(int argc, char *argv[]) {
-    int size_all;
-    std::cin >> size_all;
-    dim3 threadsPerBlock;
-    dim3 blocksPerGrid;
+struct Point
+{
+    int x, y;
+};
 
-    threadsPerBlock.x = 32;
-    threadsPerBlock.y = 1;
-    threadsPerBlock.z = 1;
+// helper for main()
 
-    blocksPerGrid.x = 8;
-    blocksPerGrid.y = 1;
-    blocksPerGrid.z = 1;
+typedef struct {
+    Point v;
+    void* next;
+} LinkNode;
 
-    //
-    // Parse argv
-    //
+// helper function for reading numbers from stdin
+// it's 'optimized' not to check validity of the characters it reads in..
+long readList(Point* list, Point points[],int n) {
     tm();
-    
-    for (int i = 1; i < argc; i++) {
-        if (argv[i][0] == '-' && argv[i][1] && !argv[i][2]) {
-            char arg = argv[i][1];
-            unsigned int* toSet = 0;
-            switch(arg) {
-                case 'x':
-                    toSet = &threadsPerBlock.x;
-                    break;
-                case 'y':
-                    toSet = &threadsPerBlock.y;
-                    break;
-                case 'z':
-                    toSet = &threadsPerBlock.z;
-                    break;
-                case 'X':
-                    toSet = &blocksPerGrid.x;
-                    break;
-                case 'Y':
-                    toSet = &blocksPerGrid.y;
-                    break;
-                case 'Z':
-                    toSet = &blocksPerGrid.z;
-                    break;
-                case 'v':
-                    verbose = true;
-                    break;
-                default:
-                    std::cout << "unknown argument: " << arg << '\n';
-                    return -1;
-            }
-
-            if (toSet) {
-                i++;
-                *toSet = (unsigned int) strtol(argv[i], 0, 10);
-            }
-        }
-        else {
-            if (argv[i][0] == '?' && !argv[i][1])
-                std::cout << "help:\n";
-            else
-                std::cout << "invalid argument: " << argv[i] << '\n';
-            return -1;
-        }
+    Point v;
+    long size = 0;
+    LinkNode* node = 0;
+    LinkNode* first = 0;
+    while (size < n) {
+        LinkNode* next = new LinkNode();
+        v.x = points[i].x;
+        v.y = points[i].y;
+        next->v.x = v.x;
+        next->v.y = v.y;
+        if (node)
+            node->next = next;
+        else
+            first = next;
+        node = next;
+        size++;
     }
 
-    if (verbose) {
-        std::cout << "parse argv " << tm() << " microseconds\n";
-        std::cout << "\nthreadsPerBlock:"
-                  << "\n  x: " << threadsPerBlock.x
-                  << "\n  y: " << threadsPerBlock.y
-                  << "\n  z: " << threadsPerBlock.z
-                  << "\n\nblocksPerGrid:"
-                  << "\n  x:" << blocksPerGrid.x
-                  << "\n  y:" << blocksPerGrid.y
-                  << "\n  z:" << blocksPerGrid.z
-                  << "\n\n total threads: "
-                  << threadsPerBlock.x * threadsPerBlock.y * threadsPerBlock.z *
-                     blocksPerGrid.x * blocksPerGrid.y * blocksPerGrid.z
-                  << "\n\n";
-    }
 
-    //
-    // Read numbers from stdin
-    //
-    long* data;
-    long size = readList(&data);
-    if (!size) return -1;
+    if (size) {
+        list = (Point*)malloc(n * sizeof(Point));
+        LinkNode* node = first;
+        long i = 0;
+        while (node) {
+            list[i].x = node->v.x;
+            list[i].y = node->v.y;
+            node = (LinkNode*) node->next;
+            i++;
+        }
+
+    }
 
     if (verbose)
-        std::cout << "sorting " << size << " numbers\n\n";
+        std::cout << "read stdin: " << tm() << " microseconds\n";
 
-    for (int i = 0; i < size; i++) {
-        std::cout << data[i] << '\n';
+    return size;
+}
+
+//
+// Finally, sort something
+// gets called by gpu_mergesort() for each slice
+//
+__device__ void gpu_bottomUpMerge(long* source, long* dest, long start, long middle, long end) {
+    long i = start;
+    long j = middle;
+    for (long k = start; k < end; k++) {
+        if (i < middle && (j >= end || source[i] < source[j])) {
+            dest[k] = source[i];
+            i++;
+        } else {
+            dest[k] = source[j];
+            j++;
+        }
     }
+}
 
-    // merge-sort the data
-    mergesort(data, size, threadsPerBlock, blocksPerGrid);
+// GPU helper function
+// calculate the id of the current thread
+__device__ unsigned int getIdx(dim3* threads, dim3* blocks) {
+    int x;
+    return threadIdx.x +
+           threadIdx.y * (x  = threads->x) +
+           threadIdx.z * (x *= threads->y) +
+           blockIdx.x  * (x *= threads->z) +
+           blockIdx.y  * (x *= blocks->z) +
+           blockIdx.z  * (x *= blocks->y);
+}
 
-    tm();
+//
+// Perform a full mergesort on our section of the data.
+//
+__global__ void gpu_mergesort(long* source, long* dest, long size, long width, long slices, dim3* threads, dim3* blocks) {
+    unsigned int idx = getIdx(threads, blocks);
+    long start = width*idx*slices,
+         middle,
+         end;
 
-    //
-    // Print out the list
-    //
-    for (int i = 0; i < size; i++) {
-        std::cout << data[i] << '\n';
-    }
+    for (long slice = 0; slice < slices; slice++) {
+        if (start >= size)
+            break;
 
-    if (verbose) {
-        std::cout << "print list to stdout: " << tm() << " microseconds\n";
+        middle = min(start + (width >> 1), size);
+        end = min(start + width, size);
+        gpu_bottomUpMerge(source, dest, start, middle, end);
+        start += width;
     }
 }
 
@@ -239,108 +227,128 @@ void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) 
         std::cout << "cudaFree: " << tm() << " microseconds\n";
 }
 
-// GPU helper function
-// calculate the id of the current thread
-__device__ unsigned int getIdx(dim3* threads, dim3* blocks) {
-    int x;
-    return threadIdx.x +
-           threadIdx.y * (x  = threads->x) +
-           threadIdx.z * (x *= threads->y) +
-           blockIdx.x  * (x *= threads->z) +
-           blockIdx.y  * (x *= blocks->z) +
-           blockIdx.z  * (x *= blocks->y);
-}
+int Cuda_Main(int argc, char *argv[], Point points, int tamanio) {
+    
+    dim3 threadsPerBlock;
+    dim3 blocksPerGrid;
 
-//
-// Perform a full mergesort on our section of the data.
-//
-__global__ void gpu_mergesort(long* source, long* dest, long size, long width, long slices, dim3* threads, dim3* blocks) {
-    unsigned int idx = getIdx(threads, blocks);
-    long start = width*idx*slices,
-         middle,
-         end;
+    threadsPerBlock.x = 32;
+    threadsPerBlock.y = 1;
+    threadsPerBlock.z = 1;
 
-    for (long slice = 0; slice < slices; slice++) {
-        if (start >= size)
-            break;
+    blocksPerGrid.x = 8;
+    blocksPerGrid.y = 1;
+    blocksPerGrid.z = 1;
 
-        middle = min(start + (width >> 1), size);
-        end = min(start + width, size);
-        gpu_bottomUpMerge(source, dest, start, middle, end);
-        start += width;
-    }
-}
-
-//
-// Finally, sort something
-// gets called by gpu_mergesort() for each slice
-//
-__device__ void gpu_bottomUpMerge(long* source, long* dest, long start, long middle, long end) {
-    long i = start;
-    long j = middle;
-    for (long k = start; k < end; k++) {
-        if (i < middle && (j >= end || source[i] < source[j])) {
-            dest[k] = source[i];
-            i++;
-        } else {
-            dest[k] = source[j];
-            j++;
-        }
-    }
-}
-
-// read data into a minimal linked list
-typedef struct {
-    int v;
-    void* next;
-} LinkNode;
-
-// helper function for reading numbers from stdin
-// it's 'optimized' not to check validity of the characters it reads in..
-long readList(long** list) {
+    //
+    // Parse argv
+    //
     tm();
-    long v, size = 0;
-    LinkNode* node = 0;
-    LinkNode* first = 0;
-    while (std::cin >> v) {
-        LinkNode* next = new LinkNode();
-        next->v = v;
-        if (node)
-            node->next = next;
-        else
-            first = next;
-        node = next;
-        size++;
-    }
+    
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-' && argv[i][1] && !argv[i][2]) {
+            char arg = argv[i][1];
+            unsigned int* toSet = 0;
+            switch(arg) {
+                case 'x':
+                    toSet = &threadsPerBlock.x;
+                    break;
+                case 'y':
+                    toSet = &threadsPerBlock.y;
+                    break;
+                case 'z':
+                    toSet = &threadsPerBlock.z;
+                    break;
+                case 'X':
+                    toSet = &blocksPerGrid.x;
+                    break;
+                case 'Y':
+                    toSet = &blocksPerGrid.y;
+                    break;
+                case 'Z':
+                    toSet = &blocksPerGrid.z;
+                    break;
+                case 'v':
+                    verbose = true;
+                    break;
+                default:
+                    std::cout << "unknown argument: " << arg << '\n';
+                    return -1;
+            }
 
-
-    if (size) {
-        *list = new long[size];
-        LinkNode* node = first;
-        long i = 0;
-        while (node) {
-            (*list)[i++] = node->v;
-            node = (LinkNode*) node->next;
+            if (toSet) {
+                i++;
+                *toSet = (unsigned int) strtol(argv[i], 0, 10);
+            }
         }
-
+        else {
+            if (argv[i][0] == '?' && !argv[i][1])
+                std::cout << "help:\n";
+            else
+                std::cout << "invalid argument: " << argv[i] << '\n';
+            return -1;
+        }
     }
+
+    if (verbose) {
+        std::cout << "parse argv " << tm() << " microseconds\n";
+        std::cout << "\nthreadsPerBlock:"
+                  << "\n  x: " << threadsPerBlock.x
+                  << "\n  y: " << threadsPerBlock.y
+                  << "\n  z: " << threadsPerBlock.z
+                  << "\n\nblocksPerGrid:"
+                  << "\n  x:" << blocksPerGrid.x
+                  << "\n  y:" << blocksPerGrid.y
+                  << "\n  z:" << blocksPerGrid.z
+                  << "\n\n total threads: "
+                  << threadsPerBlock.x * threadsPerBlock.y * threadsPerBlock.z *
+                     blocksPerGrid.x * blocksPerGrid.y * blocksPerGrid.z
+                  << "\n\n";
+    }
+
+    //
+    // Read numbers from stdin
+    //
+    Point* data;
+    long size = readList(data,points,tamanio);
+    if (!size) return -1;
 
     if (verbose)
-        std::cout << "read stdin: " << tm() << " microseconds\n";
+        std::cout << "sorting " << size << " numbers\n\n";
 
-    return size;
+    for (int i = 0; i < size; i++) {
+        std::cout << data[i] << '\n';
+    }
+
+    // merge-sort the data
+    mergesort(data, size, threadsPerBlock, blocksPerGrid);
+
+    tm();
+
+    //
+    // Print out the list
+    //
+    for (int i = 0; i < size; i++) {
+        std::cout << data[i] << '\n';
+    }
+
+    if (verbose) {
+        std::cout << "print list to stdout: " << tm() << " microseconds\n";
+    }
 }
 
+int main(int argc, char *argv[]){
+    int n;
+    cin >> n;
+    cout << n << endl;
+    Point points[n];
 
-//
-// Get the time (in microseconds) since the last call to tm();
-// the first value returned by this must not be trusted
-//
-timeval tStart;
-int tm() {
-    timeval tEnd;
-    gettimeofday(&tEnd, 0);
-    int t = (tEnd.tv_sec - tStart.tv_sec) * 1000000 + tEnd.tv_usec - tStart.tv_usec;
-    tStart = tEnd;
-    return t;
+    for(int i = 0;  i < n; i++){
+        cin >> points[i].x;
+        cin >> points[i].y;
+        cout << points[i].x << " " << points[i].y << endl;
+    }
+
+    Cuda_Main(argc,argv,points, n);
+    return 0;
 }
