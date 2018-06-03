@@ -108,7 +108,7 @@ void convexHull(int argc, char* argv[], Point points[], int n)
 
    for(int i = 0; i < n; i++){
      points[i] = point[i];
-     cout << "(" << points[i].x << "," << points[i].y << ")" <<endl;
+     //cout << "(" << points[i].x << "," << points[i].y << ")" <<endl;
    }
 
    // If two or more points make same angle with p0,

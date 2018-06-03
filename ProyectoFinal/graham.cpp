@@ -97,11 +97,11 @@ void convexHull(Point points[], int n)
    // direction) than p1
    p0 = points[0];
    qsort(&points[1], n-1, sizeof(Point), compare);
-
+   /*
    for(int i = 0; i < n; i++){
       cout<<"("<<points[i].x<<","<<points[i].y<<")"<<endl;
    }
-
+   */
    // If two or more points make same angle with p0,
    // Remove all but the one that is farthest from p0
    // Remember that, in above sorting, our criteria was
