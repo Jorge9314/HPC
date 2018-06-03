@@ -73,7 +73,7 @@ long readList(Point* list,int n) {
 // Finally, sort something
 // gets called by gpu_mergesort() for each slice
 //
-__device__ void gpu_bottomUpMerge(long* source, long* dest, long start, long middle, long end) {
+__device__ void gpu_bottomUpMerge(Point* source, Point* dest, long start, long middle, long end) {
     long i = start;
     long j = middle;
     for (long k = start; k < end; k++) {
@@ -102,7 +102,7 @@ __device__ unsigned int getIdx(dim3* threads, dim3* blocks) {
 //
 // Perform a full mergesort on our section of the data.
 //
-__global__ void gpu_mergesort(long* source, long* dest, long size, long width, long slices, dim3* threads, dim3* blocks) {
+__global__ void gpu_mergesort(Point* source, Point* dest, long size, long width, long slices, dim3* threads, dim3* blocks) {
     unsigned int idx = getIdx(threads, blocks);
     long start = width*idx*slices,
          middle,
@@ -200,7 +200,7 @@ void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid)
 
         // Actually call the kernel
         std::cout<< "llamando a a GPU"<<std::endl;
-        //gpu_mergesort<<<blocksPerGrid, threadsPerBlock>>>(A, B, size, width, slices, D_threads, D_blocks);
+        gpu_mergesort<<<blocksPerGrid, threadsPerBlock>>>(A, B, size, width, slices, D_threads, D_blocks);
         std::cout<< "saliendo de la GPU"<<std::endl;
 
         if (verbose)
