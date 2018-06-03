@@ -10,7 +10,7 @@ struct Point
 };
 
 // helper for main()
-long readList(Point**);
+long readList(Point** list, Point points, int s);
 
 // data[], size, threads, blocks,
 void mergesort(long*, long, dim3, dim3);
