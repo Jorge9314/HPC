@@ -345,7 +345,7 @@ int Cuda_Main(int argc, char *argv[], Point* points, int tamanio, Point* p0) {
     //
     // Print out the list
     //
-    for(int i = 0; i < tamanio< i++){
+    for(int i = 0; i < tamanio; i++){
         printf("(%d,%d)\n", points[i].x,points[i].y);
     }
 
