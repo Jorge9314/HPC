@@ -20,7 +20,12 @@ int tm();
 
 bool verbose;
 
-int main(int argc, char** argv) {
+struct Point
+{
+    int x, y;
+};
+
+int Cuda_main(Point points[], int size) {
     int size_all;
     std::cin >> size_all;
     dim3 threadsPerBlock;
@@ -38,6 +43,7 @@ int main(int argc, char** argv) {
     // Parse argv
     //
     tm();
+    /*
     for (int i = 1; i < argc; i++) {
         if (argv[i][0] == '-' && argv[i][1] && !argv[i][2]) {
             char arg = argv[i][1];
@@ -81,7 +87,7 @@ int main(int argc, char** argv) {
                 std::cout << "invalid argument: " << argv[i] << '\n';
             return -1;
         }
-    }
+    }*/
 
     if (verbose) {
         std::cout << "parse argv " << tm() << " microseconds\n";
