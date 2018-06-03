@@ -5,6 +5,8 @@
 #include <sys/time.h>
 #define min(a, b) (a < b ? a : b)
 
+unsing namespace std;
+
 bool verbose;
 timeval tStart;
 int tm() {
@@ -37,8 +39,8 @@ long readList(Point* list, Point points[],int n) {
     LinkNode* first = 0;
     while (size < n) {
         LinkNode* next = new LinkNode();
-        v.x = points[i].x;
-        v.y = points[i].y;
+        v.x = points[size].x;
+        v.y = points[size].y;
         next->v.x = v.x;
         next->v.y = v.y;
         if (node)
@@ -316,21 +318,14 @@ int Cuda_Main(int argc, char *argv[], Point points, int tamanio) {
     if (verbose)
         std::cout << "sorting " << size << " numbers\n\n";
 
-    for (int i = 0; i < size; i++) {
-        std::cout << data[i] << '\n';
-    }
-
     // merge-sort the data
-    mergesort(data, size, threadsPerBlock, blocksPerGrid);
+    //mergesort(data, size, threadsPerBlock, blocksPerGrid);
 
     tm();
 
     //
     // Print out the list
     //
-    for (int i = 0; i < size; i++) {
-        std::cout << data[i] << '\n';
-    }
 
     if (verbose) {
         std::cout << "print list to stdout: " << tm() << " microseconds\n";
