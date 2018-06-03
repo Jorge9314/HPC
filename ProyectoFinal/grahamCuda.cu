@@ -69,7 +69,7 @@ int compare(const void *vp1, const void *vp2)
 }
 
 // Prints convex hull of a set of n points.
-void convexHull(Point points[], int n)
+void convexHull(int argc, char* argv[], Point points[], int n)
 {
    // Find the bottommost point
    int ymin = points[0].y, min = 0;
