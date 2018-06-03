@@ -4,6 +4,11 @@
 #include <cuda.h>
 #include <sys/time.h>
 
+struct Point
+{
+    int x, y;
+};
+
 // helper for main()
 long readList(Point**);
 
@@ -19,11 +24,6 @@ int tm();
 #define min(a, b) (a < b ? a : b)
 
 bool verbose;
-
-struct Point
-{
-    int x, y;
-};
 
 int distSq(Point p1, Point p2);
 
