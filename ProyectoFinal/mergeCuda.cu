@@ -5,7 +5,7 @@
 #include <sys/time.h>
 
 // helper for main()
-long readList(long**);
+long readList(Point**);
 
 // data[], size, threads, blocks,
 void mergesort(long*, long, dim3, dim3);
@@ -299,7 +299,7 @@ typedef struct {
 
 // helper function for reading numbers from stdin
 // it's 'optimized' not to check validity of the characters it reads in..
-long readList(Point* list,Point points[],int s) {
+long readList(Point** list,Point points[],int s) {
     tm();
     Point v; 
     long size = 0;
@@ -321,13 +321,13 @@ long readList(Point* list,Point points[],int s) {
 
 
     if (size) {
-        list = new Point[size];
+        *list = new Point[size];
         LinkNode* node = first;
         long i = 0;
         while (node) {
 
-            (list)[i++].x = node->v.x;
-            (list)[i++].y = node->v.y;
+            (*list)[i++].x = node->v.x;
+            (*list)[i++].y = node->v.y;
             node = (LinkNode*) node->next;
         }
 
