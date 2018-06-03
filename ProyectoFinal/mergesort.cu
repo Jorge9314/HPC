@@ -1,119 +1,346 @@
+#include <iostream>
 #include <stdio.h>
-#include <math.h>
+#include <malloc.h>
 #include <cuda.h>
+#include <sys/time.h>
 
-__host__ void checkCudaState(cudaError_t& cudaState,const char *message){
-  /* it will print an error message if there is */
-  if(cudaState != cudaSuccess) printf("%s",message);
-}
+// helper for main()
+long readList(long**);
 
-__device__ void swap(int *points,uint lowIndex,uint upIndex){
-  /* it will swap two points */
-  int aux = points[lowIndex];
-  points[lowIndex] = points[upIndex];
-  points[upIndex] = aux;
-}
+// data[], size, threads, blocks,
+void mergesort(long*, long, dim3, dim3);
+// A[]. B[], size, width, slices, nThreads
+__global__ void gpu_mergesort(long*, long*, long, long, long, dim3*, dim3*);
+__device__ void gpu_bottomUpMerge(long*, long*, long, long, long);
 
-__global__ void sort(int *points,uint phase,uint n){
-  /* it will sort with points array with respect to phase*/
-  uint ti = blockIdx.x*blockDim.x+threadIdx.x;
-  if(ti >= n || ti == 0) return;
+// profiling
+int tm();
 
-  if(ti%phase == 0){ // multiplier phase
-    uint top = ti, lower = (top - phase) + 1;
-    uint middle = lower + phase/2;
-    uint lowG1 = lower, lowG2 = middle, topG1 = middle-1, topG2 = top;
-    while(true){
-      if(lowG1 > topG1 && lowG2 > topG2) break;
+#define min(a, b) (a < b ? a : b)
 
-      // --------------------- case 1 ---------------------
-      if(lowG1 <= topG1 && lowG2 <= topG2){
+bool verbose;
 
-        if(points[lowG1] > points[lowG2]){
-          swap(points,lowG1,lowG2);
-          lowG2++;
+int main(int argc, char *argv[]) {
+    int size_all;
+    std::cin >> size_all;
+    dim3 threadsPerBlock;
+    dim3 blocksPerGrid;
+
+    threadsPerBlock.x = 32;
+    threadsPerBlock.y = 1;
+    threadsPerBlock.z = 1;
+
+    blocksPerGrid.x = 8;
+    blocksPerGrid.y = 1;
+    blocksPerGrid.z = 1;
+
+    //
+    // Parse argv
+    //
+    tm();
+    
+    for (int i = 1; i < argc; i++) {
+        if (argv[i][0] == '-' && argv[i][1] && !argv[i][2]) {
+            char arg = argv[i][1];
+            unsigned int* toSet = 0;
+            switch(arg) {
+                case 'x':
+                    toSet = &threadsPerBlock.x;
+                    break;
+                case 'y':
+                    toSet = &threadsPerBlock.y;
+                    break;
+                case 'z':
+                    toSet = &threadsPerBlock.z;
+                    break;
+                case 'X':
+                    toSet = &blocksPerGrid.x;
+                    break;
+                case 'Y':
+                    toSet = &blocksPerGrid.y;
+                    break;
+                case 'Z':
+                    toSet = &blocksPerGrid.z;
+                    break;
+                case 'v':
+                    verbose = true;
+                    break;
+                default:
+                    std::cout << "unknown argument: " << arg << '\n';
+                    return -1;
+            }
+
+            if (toSet) {
+                i++;
+                *toSet = (unsigned int) strtol(argv[i], 0, 10);
+            }
         }
-        else lowG1++;
-
-      }
-
-      // --------------------- case 2 ---------------------
-      else if(lowG1 < topG1 && lowG2 > topG2){
-        uint next = lowG1 + 1;
-        if(points[lowG1] > points[next])
-          swap(points,lowG1,next);
-        lowG1++;
-      }
-
-      // --------------------- case 3 ---------------------
-      else if(lowG2 < topG2 && lowG1 > topG1){
-        uint next = lowG2 + 1;
-        if(points[lowG2] > points[next])
-          swap(points,lowG2,next);
-        lowG2++;
-      }
-
-      else if(lowG1 == topG1)
-        lowG1++;
-      else if(lowG2 == topG2)
-        lowG2++;
+        else {
+            if (argv[i][0] == '?' && !argv[i][1])
+                std::cout << "help:\n";
+            else
+                std::cout << "invalid argument: " << argv[i] << '\n';
+            return -1;
+        }
     }
-  }
-}
 
-__host__ void fill(int *points,size_t n){
-  /* it will fill points array */
-  for(size_t i=0; i<n; i++)
-    points[i] = n-i;
-}
-
-__host__ void show(int* points,size_t n){
-  /* it will show points array */
-  for(size_t i=0; i<n; i++)
-    printf("%d ",points[i]);
-  printf("\n\n");
-}
-
-int main(){
-  
-  int items;
-  cin>>items;
-
-  size_t size = items*sizeof(int);
-  cudaError_t cudaState = cudaSuccess;
-
-  int *h_points = NULL, *d_points = NULL, *h_result = NULL;
-
-  h_points = (int*)malloc(size);
-  h_result = (int*)malloc(size);
-
-  for(int i = 0; i < items; i++){
-    cin>>h_points;
-  }
-
-  cudaState = cudaMalloc((void**)&d_points,size);
-  checkCudaState(cudaState,"Impossible allocate data\n");
-
-  if(d_points != NULL){
-    cudaState = cudaMemcpy(d_points,h_points,size,cudaMemcpyHostToDevice);
-    checkCudaState(cudaState,"Impossible copy data from host to device\n");
-    show(h_points,items);
-
-    dim3 blockSize(1024,1,1);
-    dim3 gridSize((int)(ceil(items/1024.0)),1,1);
-    uint i = 1;
-    while(pow(2,i) <= items){
-      sort<<<gridSize,blockSize>>>(d_points,pow(2,i),items);
-      cudaDeviceSynchronize();
-      i++;
+    if (verbose) {
+        std::cout << "parse argv " << tm() << " microseconds\n";
+        std::cout << "\nthreadsPerBlock:"
+                  << "\n  x: " << threadsPerBlock.x
+                  << "\n  y: " << threadsPerBlock.y
+                  << "\n  z: " << threadsPerBlock.z
+                  << "\n\nblocksPerGrid:"
+                  << "\n  x:" << blocksPerGrid.x
+                  << "\n  y:" << blocksPerGrid.y
+                  << "\n  z:" << blocksPerGrid.z
+                  << "\n\n total threads: "
+                  << threadsPerBlock.x * threadsPerBlock.y * threadsPerBlock.z *
+                     blocksPerGrid.x * blocksPerGrid.y * blocksPerGrid.z
+                  << "\n\n";
     }
-    cudaState = cudaMemcpy(h_result,d_points,size,cudaMemcpyDeviceToHost);
-    checkCudaState(cudaState,"Impossible copy data from device to host\n");
-    show(h_result,items);
-  }
 
-  if(h_points != NULL) free(h_points);
-  if(h_result != NULL) free(h_result);
-  if(d_points != NULL) cudaFree(d_points);
-  return 0;
+    //
+    // Read numbers from stdin
+    //
+    long* data;
+    long size = readList(&data);
+    if (!size) return -1;
+
+    if (verbose)
+        std::cout << "sorting " << size << " numbers\n\n";
+
+    for (int i = 0; i < size; i++) {
+        std::cout << data[i] << '\n';
+    }
+
+    // merge-sort the data
+    mergesort(data, size, threadsPerBlock, blocksPerGrid);
+
+    tm();
+
+    //
+    // Print out the list
+    //
+    for (int i = 0; i < size; i++) {
+        std::cout << data[i] << '\n';
+    }
+
+    if (verbose) {
+        std::cout << "print list to stdout: " << tm() << " microseconds\n";
+    }
+}
+
+void mergesort(long* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) {
+
+    //
+    // Allocate two arrays on the GPU
+    // we switch back and forth between them during the sort
+    //
+    long* D_data;
+    long* D_swp;
+    dim3* D_threads;
+    dim3* D_blocks;
+    cudaError_t error = cudaSuccess;
+    // Actually allocate the two arrays
+    tm();
+    std::cout<<"reservando memoria con cudamalloc"<<std::endl;
+    error = cudaMalloc((void**) &D_data, size * sizeof(long));
+    if(error != cudaSuccess){
+           std::cout<<"Error reservando memoria para D_data"<<std::endl;
+     }
+    std::cout<<"pass 1"<<std::endl;
+    error = cudaMalloc((void**) &D_swp, size * sizeof(long));
+    if(error != cudaSuccess){
+           std::cout<<"Error reservando memoria para D_swp"<<std::endl;
+     }
+    std::cout<<"pass 2"<<std::endl;
+    if (verbose)
+        std::cout << "cudaMalloc device lists: " << tm() << " microseconds\n";
+
+    // Copy from our input list into the first array
+    cudaMemcpy(D_data, data, size * sizeof(long), cudaMemcpyHostToDevice);
+    std::cout<<"copy 1"<<std::endl;
+    if (verbose)
+        std::cout << "cudaMemcpy list to device: " << tm() << " microseconds\n";
+
+    //
+    // Copy the thread / block info to the GPU as well
+    //
+    error = cudaMalloc((void**) &D_threads, sizeof(dim3));
+    if(error != cudaSuccess){
+           std::cout<<"Error reservando memoria para D_threads"<<std::endl;
+     }
+    error = cudaMalloc((void**) &D_blocks, sizeof(dim3));
+    if(error != cudaSuccess){
+           std::cout<<"Error reservando memoria para D_blocks"<<std:: endl;
+     }
+
+    std::cout<<"pass t and b"<<std::endl;
+
+    if (verbose)
+        std::cout << "cudaMalloc device thread data: " << tm() << " microseconds\n";
+    cudaMemcpy(D_threads, &threadsPerBlock, sizeof(dim3), cudaMemcpyHostToDevice);
+    cudaMemcpy(D_blocks, &blocksPerGrid, sizeof(dim3), cudaMemcpyHostToDevice);
+
+    std::cout<<"copy t and b"<<std::endl;
+
+    if (verbose)
+        std::cout << "cudaMemcpy thread data to device: " << tm() << " microseconds\n";
+
+    long* A = D_data;
+    long* B = D_swp;
+
+    long nThreads = threadsPerBlock.x * threadsPerBlock.y * threadsPerBlock.z *
+                    blocksPerGrid.x * blocksPerGrid.y * blocksPerGrid.z;
+
+    //
+    // Slice up the list and give pieces of it to each thread, letting the pieces grow
+    // bigger and bigger until the whole list is sorted
+    //
+    std::cout<<"antes del ciclo for extraño"<<std::endl;
+
+    for (int width = 2; width < (size << 1); width <<= 1) {
+        long slices = size / ((nThreads) * width) + 1;
+
+        if (verbose) {
+            std::cout << "mergeSort - width: " << width
+                      << ", slices: " << slices
+                      << ", nThreads: " << nThreads << '\n';
+            tm();
+        }
+
+        // Actually call the kernel
+        std::cout<< "llamando a a GPU"<<std::endl;
+        gpu_mergesort<<<blocksPerGrid, threadsPerBlock>>>(A, B, size, width, slices, D_threads, D_blocks);
+        std::cout<< "saliendo de la GPU"<<std::endl;
+
+        if (verbose)
+            std::cout << "call mergesort kernel: " << tm() << " microseconds\n";
+
+        // Switch the input / output arrays instead of copying them around
+        A = A == D_data ? D_swp : D_data;
+        B = B == D_data ? D_swp : D_data;
+    }
+
+    //
+    // Get the list back from the GPU
+    //
+    tm();
+    cudaMemcpy(data, A, size * sizeof(long), cudaMemcpyDeviceToHost);
+    if (verbose)
+        std::cout << "cudaMemcpy list back to host: " << tm() << " microseconds\n";
+
+
+    // Free the GPU memory
+    cudaFree(A);
+    cudaFree(B);
+    if (verbose)
+        std::cout << "cudaFree: " << tm() << " microseconds\n";
+}
+
+// GPU helper function
+// calculate the id of the current thread
+__device__ unsigned int getIdx(dim3* threads, dim3* blocks) {
+    int x;
+    return threadIdx.x +
+           threadIdx.y * (x  = threads->x) +
+           threadIdx.z * (x *= threads->y) +
+           blockIdx.x  * (x *= threads->z) +
+           blockIdx.y  * (x *= blocks->z) +
+           blockIdx.z  * (x *= blocks->y);
+}
+
+//
+// Perform a full mergesort on our section of the data.
+//
+__global__ void gpu_mergesort(long* source, long* dest, long size, long width, long slices, dim3* threads, dim3* blocks) {
+    unsigned int idx = getIdx(threads, blocks);
+    long start = width*idx*slices,
+         middle,
+         end;
+
+    for (long slice = 0; slice < slices; slice++) {
+        if (start >= size)
+            break;
+
+        middle = min(start + (width >> 1), size);
+        end = min(start + width, size);
+        gpu_bottomUpMerge(source, dest, start, middle, end);
+        start += width;
+    }
+}
+
+//
+// Finally, sort something
+// gets called by gpu_mergesort() for each slice
+//
+__device__ void gpu_bottomUpMerge(long* source, long* dest, long start, long middle, long end) {
+    long i = start;
+    long j = middle;
+    for (long k = start; k < end; k++) {
+        if (i < middle && (j >= end || source[i] < source[j])) {
+            dest[k] = source[i];
+            i++;
+        } else {
+            dest[k] = source[j];
+            j++;
+        }
+    }
+}
+
+// read data into a minimal linked list
+typedef struct {
+    int v;
+    void* next;
+} LinkNode;
+
+// helper function for reading numbers from stdin
+// it's 'optimized' not to check validity of the characters it reads in..
+long readList(long** list) {
+    tm();
+    long v, size = 0;
+    LinkNode* node = 0;
+    LinkNode* first = 0;
+    while (std::cin >> v) {
+        LinkNode* next = new LinkNode();
+        next->v = v;
+        if (node)
+            node->next = next;
+        else
+            first = next;
+        node = next;
+        size++;
+    }
+
+
+    if (size) {
+        *list = new long[size];
+        LinkNode* node = first;
+        long i = 0;
+        while (node) {
+            (*list)[i++] = node->v;
+            node = (LinkNode*) node->next;
+        }
+
+    }
+
+    if (verbose)
+        std::cout << "read stdin: " << tm() << " microseconds\n";
+
+    return size;
+}
+
+
+//
+// Get the time (in microseconds) since the last call to tm();
+// the first value returned by this must not be trusted
+//
+timeval tStart;
+int tm() {
+    timeval tEnd;
+    gettimeofday(&tEnd, 0);
+    int t = (tEnd.tv_sec - tStart.tv_sec) * 1000000 + tEnd.tv_usec - tStart.tv_usec;
+    tStart = tEnd;
+    return t;
 }
