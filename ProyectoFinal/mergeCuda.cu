@@ -15,7 +15,6 @@ __device__ void gpu_bottomUpMerge(long*, long*, long, long, long);
 
 // profiling
 int tm();
-int distSq(Point p1, Point p2);
 
 #define min(a, b) (a < b ? a : b)
 
@@ -26,7 +25,9 @@ struct Point
     int x, y;
 };
 
-int Cuda_main(Point points[], int n) {
+int distSq(Point p1, Point p2);
+
+void Cuda_main(Point points[], int n) {
     
     dim3 threadsPerBlock;
     dim3 blocksPerGrid;
@@ -303,14 +304,16 @@ typedef struct {
 // it's 'optimized' not to check validity of the characters it reads in..
 long readList(long** list,Point points[],int s) {
     tm();
-    Point v, 
+    Point v; 
     long size = 0;
     LinkNode* node = 0;
     LinkNode* first = 0;
     while (size < s) {
         LinkNode* next = new LinkNode();
-        next->v.x = points[size].x;
-        next->v.y = points[size].y;
+        v.x = points[size].x;
+        v.y = points[size].y;
+        next->v.x = v.x;
+        next->v.y = v.y;
         if (node)
             node->next = next;
         else
