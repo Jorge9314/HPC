@@ -99,7 +99,7 @@ void convexHull(Point points[], int n)
    qsort(&points[1], n-1, sizeof(Point), compare);
 
    for(int i = 0; i < n; i++){
-      cout<<"("<<points[i]<<")"<<endl;
+      cout<<"("<<points[i].x<<","<<points[i].y<<")"<<endl;
    }
 
    // If two or more points make same angle with p0,
