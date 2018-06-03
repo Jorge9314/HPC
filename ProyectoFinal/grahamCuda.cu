@@ -9,11 +9,6 @@
 
 using namespace std;
 
-struct Point
-{
-    int x, y;
-};
-
 // A globle point needed for  sorting points with reference
 // to  the first point Used in compare function of qsort()
 Point p0;
