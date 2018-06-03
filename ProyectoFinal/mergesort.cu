@@ -20,8 +20,6 @@ struct Point
     int x, y;
 };
 
-Point p0;
-
 // helper for main()
 
 typedef struct {
@@ -75,7 +73,7 @@ long readList(Point* list,int n) {
 // Finally, sort something
 // gets called by gpu_mergesort() for each slice
 //
-__device__ void gpu_bottomUpMerge(Point* source, Point* dest, long start, long middle, long end) {
+__device__ void gpu_bottomUpMerge(Point* source, Point* dest, long start, long middle, long end, Point* p0){
     long i = start;
     long j = middle;
     for (long k = start; k < end; k++) {
@@ -108,7 +106,7 @@ __device__ unsigned int getIdx(dim3* threads, dim3* blocks) {
 //
 // Perform a full mergesort on our section of the data.
 //
-__global__ void gpu_mergesort(Point* source, Point* dest, long size, long width, long slices, dim3* threads, dim3* blocks) {
+__global__ void gpu_mergesort(Point* source, Point* dest, long size, long width, long slices, dim3* threads, dim3* blocks, Point* p0) {
     unsigned int idx = getIdx(threads, blocks);
     long start = width*idx*slices,
          middle,
@@ -120,12 +118,12 @@ __global__ void gpu_mergesort(Point* source, Point* dest, long size, long width,
 
         middle = min(start + (width >> 1), size);
         end = min(start + width, size);
-        gpu_bottomUpMerge(source, dest, start, middle, end);
+        gpu_bottomUpMerge(source, dest, start, middle, end, p0);
         start += width;
     }
 }
 
-void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid) {
+void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid, Point* P0) {
 
     //
     // Allocate two arrays on the GPU
@@ -133,11 +131,19 @@ void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid)
     //
     Point* D_data;
     Point* D_swp;
+    Point* p0;
     dim3* D_threads;
     dim3* D_blocks;
     cudaError_t error = cudaSuccess;
     // Actually allocate the two arrays
     tm();
+
+    std::cout<<"reservando memoria con cudamalloc"<<std::endl;
+    error = cudaMalloc((void**) &p0, sizeof(Point));
+    if(error != cudaSuccess){
+           std::cout<<"Error reservando memoria para D_data"<<std::endl;
+    }
+
     std::cout<<"reservando memoria con cudamalloc"<<std::endl;
     error = cudaMalloc((void**) &D_data, size * sizeof(Point));
     if(error != cudaSuccess){
@@ -206,7 +212,7 @@ void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid)
 
         // Actually call the kernel
         std::cout<< "llamando a a GPU"<<std::endl;
-        gpu_mergesort<<<blocksPerGrid, threadsPerBlock>>>(A, B, size, width, slices, D_threads, D_blocks);
+        gpu_mergesort<<<blocksPerGrid, threadsPerBlock>>>(A, B, size, width, slices, D_threads, D_blocks, p0);
         std::cout<< "saliendo de la GPU"<<std::endl;
 
         if (verbose)
@@ -233,7 +239,7 @@ void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid)
         std::cout << "cudaFree: " << tm() << " microseconds\n";
 }
 
-int Cuda_Main(int argc, char *argv[], Point* points, int tamanio) {
+int Cuda_Main(int argc, char *argv[], Point* points, int tamanio, Point* p0) {
     
     dim3 threadsPerBlock;
     dim3 blocksPerGrid;
@@ -326,7 +332,7 @@ int Cuda_Main(int argc, char *argv[], Point* points, int tamanio) {
         std::cout << "sorting " << size << " numbers\n\n";
 
     // merge-sort the data
-    mergesort(points, size, threadsPerBlock, blocksPerGrid);
+    mergesort(points, size, threadsPerBlock, blocksPerGrid, p0);
 
     tm();
 
@@ -360,8 +366,9 @@ int main(int argc, char *argv[]){
         p[i] = points[i];
     }
 
+    Point* p0;
     p0.x = 300;
     p0.y = 300;
 
-    return Cuda_Main(argc,argv,p, n);
+    return Cuda_Main(argc,argv,p, n,p0);
 }
