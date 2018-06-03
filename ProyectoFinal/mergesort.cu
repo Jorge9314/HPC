@@ -35,10 +35,10 @@ long readList(Point* list,int n) {
     long size = 0;
     LinkNode* node = 0;
     LinkNode* first = 0;
-    while (size < n) {
+    while (size < n-1) {
         LinkNode* next = new LinkNode();
-        v.x = list[size].x;
-        v.y = list[size].y;
+        v.x = list[size+1].x;
+        v.y = list[size+1].y;
         next->v.x = v.x;
         next->v.y = v.y;
         if (node)
@@ -138,23 +138,21 @@ void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid,
     // Actually allocate the two arrays
     tm();
 
-    std::cout<<"reservando memoria con cudamalloc"<<std::endl;
     error = cudaMalloc((void**) &p0, sizeof(Point));
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_data"<<std::endl;
     }
 
-    std::cout<<"reservando memoria con cudamalloc"<<std::endl;
     error = cudaMalloc((void**) &D_data, size * sizeof(Point));
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_data"<<std::endl;
      }
-    std::cout<<"pass 1"<<std::endl;
+
     error = cudaMalloc((void**) &D_swp, size * sizeof(Point));
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_swp"<<std::endl;
      }
-    std::cout<<"pass 2"<<std::endl;
+
     if (verbose)
         std::cout << "cudaMalloc device lists: " << tm() << " microseconds\n";
 
@@ -176,14 +174,10 @@ void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid,
            std::cout<<"Error reservando memoria para D_blocks"<<std:: endl;
      }
 
-    std::cout<<"pass t and b"<<std::endl;
-
     if (verbose)
         std::cout << "cudaMalloc device thread data: " << tm() << " microseconds\n";
     cudaMemcpy(D_threads, &threadsPerBlock, sizeof(dim3), cudaMemcpyHostToDevice);
     cudaMemcpy(D_blocks, &blocksPerGrid, sizeof(dim3), cudaMemcpyHostToDevice);
-
-    std::cout<<"copy t and b"<<std::endl;
 
     if (verbose)
         std::cout << "cudaMemcpy thread data to device: " << tm() << " microseconds\n";
@@ -198,7 +192,6 @@ void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid,
     // Slice up the list and give pieces of it to each thread, letting the pieces grow
     // bigger and bigger until the whole list is sorted
     //
-    std::cout<<"antes del ciclo for extraño"<<std::endl;
 
     for (int width = 2; width < (size << 1); width <<= 1) {
         long slices = size / ((nThreads) * width) + 1;
