@@ -35,10 +35,10 @@ long readList(Point* list,int n) {
     long size = 0;
     LinkNode* node = 0;
     LinkNode* first = 0;
-    while (size < n-1) {
+    while (size < n) {
         LinkNode* next = new LinkNode();
-        v.x = list[size+1].x;
-        v.y = list[size+1].y;
+        v.x = list[size].x;
+        v.y = list[size].y;
         next->v.x = v.x;
         next->v.y = v.y;
         if (node)
