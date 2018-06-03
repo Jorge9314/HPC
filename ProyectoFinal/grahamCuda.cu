@@ -159,7 +159,7 @@ void convexHull(int argc, char* argv[], Point points[], int n)
 }
 
 // Driver program to test above functions
-int main(){
+int main(int argc, char* argv[]){
 
     int n;
     cin >> n;
@@ -172,6 +172,6 @@ int main(){
         cout << points[i].x << " " << points[i].y << endl;
     }
 
-    convexHull(points, n);
+    convexHull(argc, argv, points, n);
     return 0;
 }
