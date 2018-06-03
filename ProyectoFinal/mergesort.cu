@@ -83,8 +83,8 @@ __device__ void gpu_bottomUpMerge(Point* source, Point* dest, long start, long m
     long i = start;
     long j = middle;
     for (long k = start; k < end; k++) {
-        int i_source = distSq(P[0], source[i]);
-        int j_source = distSq(P[0], source[j]);
+        int i_source = distSq(p0[0], source[i]);
+        int j_source = distSq(p0[0], source[j]);
         if (i < middle && (j >= end || i_source < j_source)) {
             dest[k] = source[i];
             i++;
