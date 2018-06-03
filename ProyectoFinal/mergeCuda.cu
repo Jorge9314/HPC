@@ -15,6 +15,7 @@ __device__ void gpu_bottomUpMerge(long*, long*, long, long, long);
 
 // profiling
 int tm();
+int distSq(Point p1, Point p2);
 
 #define min(a, b) (a < b ? a : b)
 
@@ -118,7 +119,7 @@ int Cuda_main(Point points[], int n) {
     }
 
     // merge-sort the data
-    mergesort(data, size, threadsPerBlock, blocksPerGrid);
+    //mergesort(data, size, threadsPerBlock, blocksPerGrid);
 
     tm();
 
@@ -294,13 +295,13 @@ __device__ void gpu_bottomUpMerge(long* source, long* dest, long start, long mid
 
 // read data into a minimal linked list
 typedef struct {
-    int v;
+    Point v;
     void* next;
 } LinkNode;
 
 // helper function for reading numbers from stdin
 // it's 'optimized' not to check validity of the characters it reads in..
-long readList(long** list,Points point[],int s) {
+long readList(long** list,Point points[],int s) {
     tm();
     Point v, 
     long size = 0;
@@ -308,7 +309,8 @@ long readList(long** list,Points point[],int s) {
     LinkNode* first = 0;
     while (size < s) {
         LinkNode* next = new LinkNode();
-        next->v = v;
+        next->v.x = points[size].x;
+        next->v.y = points[size].y;
         if (node)
             node->next = next;
         else
@@ -319,11 +321,13 @@ long readList(long** list,Points point[],int s) {
 
 
     if (size) {
-        *list = new long[size];
+        *list = new Point[size];
         LinkNode* node = first;
         long i = 0;
         while (node) {
-            (*list)[i++] = node->v;
+
+            (*list)[i++].x = node->v.x;
+            (*list)[i++].y = node->v.y;
             node = (LinkNode*) node->next;
         }
 
@@ -348,3 +352,12 @@ int tm() {
     tStart = tEnd;
     return t;
 }
+
+// A utility function to return square of distance
+// between p1 and p2
+int distSq(Point p1, Point p2)
+{
+    return (p1.x - p2.x)*(p1.x - p2.x) +
+          (p1.y - p2.y)*(p1.y - p2.y);
+}
+

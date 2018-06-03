@@ -36,13 +36,6 @@ int swap(Point &p1, Point &p2)
     p2 = temp;
 }
 
-// A utility function to return square of distance
-// between p1 and p2
-int distSq(Point p1, Point p2)
-{
-    return (p1.x - p2.x)*(p1.x - p2.x) +
-          (p1.y - p2.y)*(p1.y - p2.y);
-}
 
 // To find orientation of ordered triplet (p, q, r).
 // The function returns following values
