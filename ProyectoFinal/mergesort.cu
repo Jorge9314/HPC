@@ -69,7 +69,7 @@ long readList(Point* list,int n) {
     return size;
 }
 
-__device__ int distSq(Point p1, Point p2)
+__device__ int distSq_cuda(Point p1, Point p2)
 {
     return (p1.x - p2.x)*(p1.x - p2.x) +
           (p1.y - p2.y)*(p1.y - p2.y);
@@ -83,8 +83,8 @@ __device__ void gpu_bottomUpMerge(Point* source, Point* dest, long start, long m
     long i = start;
     long j = middle;
     for (long k = start; k < end; k++) {
-        int i_source = distSq(p0[0], source[i]);
-        int j_source = distSq(p0[0], source[j]);
+        int i_source = distSq_cuda(p0[0], source[i]);
+        int j_source = distSq_cuda(p0[0], source[j]);
         if (i < middle && (j >= end || i_source < j_source)) {
             dest[k] = source[i];
             i++;
