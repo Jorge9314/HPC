@@ -4,13 +4,8 @@
 #include <cuda.h>
 #include <sys/time.h>
 
-struct Point
-{
-    int x, y;
-};
-
 // helper for main()
-long readList(Point** list, Point points, int s);
+long readList(long**);
 
 // data[], size, threads, blocks,
 void mergesort(long*, long, dim3, dim3);
@@ -25,10 +20,9 @@ int tm();
 
 bool verbose;
 
-int distSq(Point p1, Point p2);
-
-void Cuda_main(Point points[], int n) {
-    
+int main(int argc, char *argv[]) {
+    int size_all;
+    std::cin >> size_all;
     dim3 threadsPerBlock;
     dim3 blocksPerGrid;
 
@@ -44,7 +38,7 @@ void Cuda_main(Point points[], int n) {
     // Parse argv
     //
     tm();
-    /*
+    
     for (int i = 1; i < argc; i++) {
         if (argv[i][0] == '-' && argv[i][1] && !argv[i][2]) {
             char arg = argv[i][1];
@@ -88,7 +82,7 @@ void Cuda_main(Point points[], int n) {
                 std::cout << "invalid argument: " << argv[i] << '\n';
             return -1;
         }
-    }*/
+    }
 
     if (verbose) {
         std::cout << "parse argv " << tm() << " microseconds\n";
@@ -109,25 +103,29 @@ void Cuda_main(Point points[], int n) {
     //
     // Read numbers from stdin
     //
-    Point* data;
-    long size = readList(&data,points,n);
+    long* data;
+    long size = readList(&data);
+    if (!size) return -1;
 
     if (verbose)
         std::cout << "sorting " << size << " numbers\n\n";
 
+    for (int i = 0; i < size; i++) {
+        std::cout << data[i] << '\n';
+    }
+
     // merge-sort the data
-    //mergesort(data, size, threadsPerBlock, blocksPerGrid);
+    mergesort(data, size, threadsPerBlock, blocksPerGrid);
 
     tm();
 
     //
     // Print out the list
     //
-    /*
     for (int i = 0; i < size; i++) {
         std::cout << data[i] << '\n';
     }
-    */
+
     if (verbose) {
         std::cout << "print list to stdout: " << tm() << " microseconds\n";
     }
@@ -293,24 +291,20 @@ __device__ void gpu_bottomUpMerge(long* source, long* dest, long start, long mid
 
 // read data into a minimal linked list
 typedef struct {
-    Point v;
+    int v;
     void* next;
 } LinkNode;
 
 // helper function for reading numbers from stdin
 // it's 'optimized' not to check validity of the characters it reads in..
-long readList(Point** list,Point points[],int s) {
+long readList(long** list) {
     tm();
-    Point v; 
-    long size = 0;
+    long v, size = 0;
     LinkNode* node = 0;
     LinkNode* first = 0;
-    while (size < s) {
+    while (std::cin >> v) {
         LinkNode* next = new LinkNode();
-        v.x = points[size].x;
-        v.y = points[size].y;
-        next->v.x = v.x;
-        next->v.y = v.y;
+        next->v = v;
         if (node)
             node->next = next;
         else
@@ -321,13 +315,11 @@ long readList(Point** list,Point points[],int s) {
 
 
     if (size) {
-        *list = new Point[size];
+        *list = new long[size];
         LinkNode* node = first;
         long i = 0;
         while (node) {
-
-            (*list)[i++].x = node->v.x;
-            (*list)[i++].y = node->v.y;
+            (*list)[i++] = node->v;
             node = (LinkNode*) node->next;
         }
 
@@ -352,12 +344,3 @@ int tm() {
     tStart = tEnd;
     return t;
 }
-
-// A utility function to return square of distance
-// between p1 and p2
-int distSq(Point p1, Point p2)
-{
-    return (p1.x - p2.x)*(p1.x - p2.x) +
-          (p1.y - p2.y)*(p1.y - p2.y);
-}
-
