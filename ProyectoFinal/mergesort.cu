@@ -20,6 +20,13 @@ struct Point
     int x, y;
 };
 
+Point p0;
+
+Point operator <(Point p1, Point p2){
+    int d_p1 = (p0.x - p1.x)*(p0.x - p1.x) + (p0.y - p1.y)*(p0.y - p1.y);
+    int d_p2 = (p0.x - p2.x)*(p0.x - p2.x) + (p0.y - p2.y)*(p0.y - p2.y);
+    return d_p1 < d_p2
+}
 // helper for main()
 
 typedef struct {
@@ -338,10 +345,12 @@ int Cuda_Main(int argc, char *argv[], Point* points, int tamanio) {
 }
 
 int main(int argc, char *argv[]){
+
     int n;
     std::cin >> n;
     std::cout << n << std::endl;
     Point points[n];
+
     Point *p;
     p = (Point*)malloc(n * sizeof(Point));
 
@@ -351,6 +360,9 @@ int main(int argc, char *argv[]){
         std::cout << points[i].x << " " << points[i].y << std::endl;
         p[i] = points[i];
     }
+
+    p0.x = 300;
+    p0.y = 300;
 
     return Cuda_Main(argc,argv,p, n);
 }
