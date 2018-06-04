@@ -331,15 +331,18 @@ int Cuda_Main(int argc, char *argv[], Point* points, int tamanio, Point* p0) {
     //
     // Read numbers from stdin
     //
-    std::cout<<"entra a readList"<<std::endl;
+    
     long size = readList(points,tamanio);
-    std::cout<<"sale a readList"<<std::endl;
+
     if (!size) return -1;
 
     if (verbose)
         std::cout << "sorting " << size << " numbers\n\n";
 
     // merge-sort the data
+    for(int i = 0; i < tamanio; i++){
+        printf("%d,%d\n", points[i].x, points[i].y);
+    }
     mergesort(points, size, threadsPerBlock, blocksPerGrid, p0);
 
     tm();
