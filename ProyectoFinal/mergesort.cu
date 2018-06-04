@@ -31,16 +31,7 @@ typedef struct {
 // it's 'optimized' not to check validity of the characters it reads in..
 long readList(Point* list,int n) {
     tm();
-
-    long size = 0;
-
-    for(int i = 0; i < n; i++){
-        size++;
-    }
-
-    if (verbose)
-        std::cout << "read stdin: " << tm() << " microseconds\n";
-
+    long size = n;
     return size;
 }
 
@@ -131,12 +122,12 @@ void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid,
     cudaError_t error = cudaSuccess;
     // Actually allocate the two arrays
     tm();
-
+    printf("reservando\n");
     error = cudaMalloc((void**) &p0, sizeof(Point));
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_data"<<std::endl;
     }
-
+    printf("primer cudamalloc con exito\n");
     error = cudaMalloc((void**) &D_data, size * sizeof(Point));
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_data"<<std::endl;
