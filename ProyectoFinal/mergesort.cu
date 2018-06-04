@@ -240,8 +240,9 @@ void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid,
 
 
     // Free the GPU memory
-    cudaFree(A);
-    cudaFree(B);
+    cudaFree(D_data);
+    cudaFree(D_swp);
+    cudaFree(p0);
     if (verbose)
         std::cout << "cudaFree: " << tm() << " microseconds\n";
 }
