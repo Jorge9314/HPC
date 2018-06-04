@@ -93,6 +93,8 @@ void convexHull(int argc, char* argv[], Point points[], int n)
    // direction) than p1
    p0 = points[0];
 
+   cout << "(" <<points[0].x << "," << points[0].y<<")"<<endl;
+
    Point* point;
    point = (Point*)malloc(n * sizeof(Point));
    Point* P0;
