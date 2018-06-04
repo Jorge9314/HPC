@@ -94,20 +94,20 @@ void convexHull(int argc, char* argv[], Point points[], int n)
    p0 = points[0];
 
    Point* point;
-   point = (Point*)malloc(n * sizeof(Point));
+   point = (Point*)malloc(n-1 * sizeof(Point));
    Point* P0;
    P0 = (Point*)malloc(sizeof(Point));
    P0[0].x = p0.x;
    P0[0].y = p0.y;
 
-   for (int i = 0; i < n; ++i){
-     point[i] = points[i];
+   for (int i = 0; i < n-1; ++i){
+     point[i] = points[i+1];
    }
 
    Cuda_Main(argc, argv, point, n, P0);
 
-   for(int i = 0; i < n; i++){
-     points[i] = point[i];
+   for(int i = 0; i < n-1; i++){
+     points[i+1] = point[i];
      cout << "(" << points[i].x << "," << points[i].y << ")" <<endl;
    }
 
