@@ -35,10 +35,10 @@ long readList(Point* list,int n) {
     long size = 0;
     LinkNode* node = 0;
     LinkNode* first = 0;
-    while (size < n) {
+    while (size < n-1) {
         LinkNode* next = new LinkNode();
-        v.x = list[size].x;
-        v.y = list[size].y;
+        v.x = list[size+1].x;
+        v.y = list[size+1].y;
         next->v.x = v.x;
         next->v.y = v.y;
         if (node)
@@ -51,7 +51,7 @@ long readList(Point* list,int n) {
 
 
     if (size) {
-        list = (Point*)malloc(n * sizeof(Point));
+        list = (Point*)malloc(n-1 * sizeof(Point));
         LinkNode* node = first;
         long i = 0;
         while (node) {
@@ -61,6 +61,10 @@ long readList(Point* list,int n) {
             i++;
         }
 
+    }
+
+    for(int k = 0; k < n-1; k++){
+        printf("((%d,%d))\n",list[k].x,list[k].y);
     }
 
     if (verbose)
