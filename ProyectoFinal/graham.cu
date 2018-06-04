@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <malloc.h>
 #include <cuda.h>
+#include <stack>
 #include <sys/time.h>
 #define min(a, b) (a < b ? a : b)
 
