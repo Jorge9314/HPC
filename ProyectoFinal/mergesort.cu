@@ -331,7 +331,9 @@ int Cuda_Main(int argc, char *argv[], Point* points, int tamanio, Point* p0) {
     //
     // Read numbers from stdin
     //
+    std::cout<<"entra a readList"<<std::endl;
     long size = readList(points,tamanio);
+    std::cout<<"sale a readList"<<std::endl;
     if (!size) return -1;
 
     if (verbose)

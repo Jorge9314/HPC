@@ -100,7 +100,7 @@ void convexHull(int argc, char* argv[], Point points[], int n)
    P0[0].x = p0.x;
    P0[0].y = p0.y;
 
-   for (int i = 0; i < n-1; ++i){
+   for (int i = 0; i < n-1; i++){
      point[i] = points[i+1];
    }
 
