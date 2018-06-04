@@ -3,6 +3,9 @@
 #include <malloc.h>
 #include <cuda.h>
 #include <sys/time.h>
+
+using namespace std;
+
 #define min(a, b) (a < b ? a : b)
 
 bool verbose;
