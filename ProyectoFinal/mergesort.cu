@@ -84,9 +84,9 @@ __device__ bool compare_cuda(Point p1, Point p2, Point p0){
    // Find orientation
    int o = orientation_cuda(p0, p1, p2);
    if (o == 0)
-     return (distSq_cuda(p0, p2) >= distSq_cuda(p0, p1))? true : false;
+     return (distSq_cuda(p0, p2) >= distSq_cuda(p0, p1))? false : true;
 
-   return (o == 2)? true : false;
+   return (o == 2)? false : true;
 }
 
 //
