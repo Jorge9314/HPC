@@ -37,8 +37,7 @@ long readList(Point* list,int n) {
     LinkNode* first = 0;
     while (size < n) {
         LinkNode* next = new LinkNode();
-        v.x = list[size+1].x;
-        v.y = list[size+1].y;
+        v = list[size];
         next->v = v;
         if (node)
             node->next = next;
@@ -50,7 +49,7 @@ long readList(Point* list,int n) {
 
 
     if (size) {
-        list = (Point*)malloc(n-1 * sizeof(Point));
+        list = (Point*)malloc(n * sizeof(Point));
         LinkNode* node = first;
         long i = 0;
         while (node) {
@@ -59,10 +58,6 @@ long readList(Point* list,int n) {
             i++;
         }
 
-    }
-
-    for(int k = 0; k < n-1; k++){
-        printf("((%d,%d))\n",list[k].x,list[k].y);
     }
 
     if (verbose)
@@ -158,12 +153,12 @@ void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid,
     cudaError_t error = cudaSuccess;
     // Actually allocate the two arrays
     tm();
-    printf("reservando\n");
+
     error = cudaMalloc((void**) &p0, sizeof(Point));
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_data"<<std::endl;
     }
-    printf("finreservand\n");
+
     error = cudaMalloc((void**) &D_data, size * sizeof(Point));
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_data"<<std::endl;
