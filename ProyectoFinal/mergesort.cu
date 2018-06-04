@@ -31,36 +31,11 @@ typedef struct {
 // it's 'optimized' not to check validity of the characters it reads in..
 long readList(Point* list,int n) {
     tm();
-    Point v;
+
     long size = 0;
-    LinkNode* node = 0;
-    LinkNode* first = 0;
-    while (size < n) {
-        LinkNode* next = new LinkNode();
-        v.x = list[size].x;
-        v.y = list[size].y;
-        next->v.x = v.x;
-        next->v.y = v.y;
-        if (node)
-            node->next = next;
-        else
-            first = next;
-        node = next;
+
+    for(int i = 0; i < n; i++){
         size++;
-    }
-
-
-    if (size) {
-        list = (Point*)malloc(n * sizeof(Point));
-        LinkNode* node = first;
-        long i = 0;
-        while (node) {
-            list[i].x = node->v.x;
-            list[i].y = node->v.y;
-            node = (LinkNode*) node->next;
-            i++;
-        }
-
     }
 
     if (verbose)
