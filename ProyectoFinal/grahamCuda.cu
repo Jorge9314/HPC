@@ -112,7 +112,7 @@ void convexHull(int argc, char* argv[], Point points[], int n)
    }
 
    free(point);
-   free(p0);
+   free(P0);
 
    // If two or more points make same angle with p0,
    // Remove all but the one that is farthest from p0
