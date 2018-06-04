@@ -31,7 +31,41 @@ typedef struct {
 // it's 'optimized' not to check validity of the characters it reads in..
 long readList(Point* list,int n) {
     tm();
-    long size = n;
+    Point v;
+    long size = 0;
+    LinkNode* node = 0;
+    LinkNode* first = 0;
+    while (size < n) {
+        LinkNode* next = new LinkNode();
+        v.x = list[size].x;
+        v.y = list[size].y;
+        next->v.x = v.x;
+        next->v.y = v.y;
+        if (node)
+            node->next = next;
+        else
+            first = next;
+        node = next;
+        size++;
+    }
+
+
+    if (size) {
+        list = (Point*)malloc(n * sizeof(Point));
+        LinkNode* node = first;
+        long i = 0;
+        while (node) {
+            list[i].x = node->v.x;
+            list[i].y = node->v.y;
+            node = (LinkNode*) node->next;
+            i++;
+        }
+
+    }
+
+    if (verbose)
+        std::cout << "read stdin: " << tm() << " microseconds\n";
+
     return size;
 }
 
@@ -122,12 +156,12 @@ void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid,
     cudaError_t error = cudaSuccess;
     // Actually allocate the two arrays
     tm();
-    printf("reservando\n");
+
     error = cudaMalloc((void**) &p0, sizeof(Point));
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_data"<<std::endl;
     }
-    printf("primer cudamalloc con exito\n");
+
     error = cudaMalloc((void**) &D_data, size * sizeof(Point));
     if(error != cudaSuccess){
            std::cout<<"Error reservando memoria para D_data"<<std::endl;
@@ -211,8 +245,6 @@ void mergesort(Point* data, long size, dim3 threadsPerBlock, dim3 blocksPerGrid,
     // Free the GPU memory
     cudaFree(A);
     cudaFree(B);
-    cudaFree(p0);
-
     if (verbose)
         std::cout << "cudaFree: " << tm() << " microseconds\n";
 }
@@ -299,18 +331,13 @@ int Cuda_Main(int argc, char *argv[], Point* points, int tamanio, Point* p0) {
     //
     // Read numbers from stdin
     //
-    
     long size = readList(points,tamanio);
-
     if (!size) return -1;
 
     if (verbose)
         std::cout << "sorting " << size << " numbers\n\n";
 
     // merge-sort the data
-    for(int i = 0; i < tamanio; i++){
-        printf("%d,%d\n", points[i].x, points[i].y);
-    }
     mergesort(points, size, threadsPerBlock, blocksPerGrid, p0);
 
     tm();

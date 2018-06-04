@@ -93,28 +93,26 @@ void convexHull(int argc, char* argv[], Point points[], int n)
    // direction) than p1
    p0 = points[0];
 
-   cout<< "punto 0 : (" <<points[0].x<<","<<points[0].y<<")"<<endl;
-
    Point* point;
-   point = (Point*)malloc(n-1 * sizeof(Point));
+   point = (Point*)malloc(n * sizeof(Point));
    Point* P0;
    P0 = (Point*)malloc(sizeof(Point));
    P0[0].x = p0.x;
    P0[0].y = p0.y;
 
-   for (int i = 0; i < n-1; i++){
-     point[i] = points[i+1];
+   for (int i = 0; i < n; i++){
+     point[i] = points[i];
    }
 
-   Cuda_Main(argc, argv, point, n-1, P0);
+   Cuda_Main(argc, argv, point, n, P0);
 
    for(int i = 0; i < n-1; i++){
-     points[i+1] = point[i];
+     points[i] = point[i];
      cout << "(" << points[i].x << "," << points[i].y << ")" <<endl;
    }
 
    free(point);
-   free(P0);
+   free(p0);
 
    // If two or more points make same angle with p0,
    // Remove all but the one that is farthest from p0
