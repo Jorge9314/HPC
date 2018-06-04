@@ -106,7 +106,7 @@ void convexHull(int argc, char* argv[], Point points[], int n)
 
    Cuda_Main(argc, argv, point, n, P0);
 
-   for(int i = 0; i < n-1; i++){
+   for(int i = 0; i < n; i++){
      points[i] = point[i];
      cout << "(" << points[i].x << "," << points[i].y << ")" <<endl;
    }
