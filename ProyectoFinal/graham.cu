@@ -9,13 +9,8 @@
 
 using namespace std;
 
-void Cuda_Main(Point p[], int size, Point p0){
-
-}
-
 // A globle point needed for  sorting points with reference
 // to  the first point Used in compare function of qsort()
-Point p0;
 
 // A utility function to find next to top in a stack
 Point nextToTop(stack<Point> &S)
@@ -48,7 +43,7 @@ int distSq(Point p1, Point p2)
 // 0 --> p, q and r are colinear
 // 1 --> Clockwise
 // 2 --> Counterclockwise
-int orientation(Point p, Point q, Point r)
+__device__ int orientation(Point p, Point q, Point r)
 {
     int val = (q.y - p.y) * (r.x - q.x) -
               (q.x - p.x) * (r.y - q.y);
@@ -59,17 +54,116 @@ int orientation(Point p, Point q, Point r)
 
 // A function used by library function qsort() to sort an array of
 // points with respect to the first point
-int compare(const void *vp1, const void *vp2)
-{
-   Point *p1 = (Point *)vp1;
-   Point *p2 = (Point *)vp2;
+__device__ bool compare_cuda(Point p1, Point p2, Point p0){
 
    // Find orientation
-   int o = orientation(p0, *p1, *p2);
+   int o = orientation(p0, p1, p2);
    if (o == 0)
-     return (distSq(p0, *p2) >= distSq(p0, *p1))? -1 : 1;
+     return false;
 
-   return (o == 2)? -1: 1;
+   return (o == 2)? true: false;
+}
+
+__device__ void gpu_bottomUpMerge(Point* source, Point* dest, long start, long middle, long end, Point* p0){
+    long i = start;
+    long j = middle;
+    for (long k = start; k < end; k++) {
+        if (i < middle && (j >= end || compare_cuda(source[i],source[j],p0[0]))) {
+            dest[k] = source[i];
+            i++;
+        } else {
+            dest[k] = source[j];
+            j++;
+        }
+    }
+}
+
+// GPU helper function
+// calculate the id of the current thread
+__device__ unsigned int getIdx(dim3* threads, dim3* blocks) {
+    int x;
+    return threadIdx.x +
+           threadIdx.y * (x  = threads->x) +
+           threadIdx.z * (x *= threads->y) +
+           blockIdx.x  * (x *= threads->z) +
+           blockIdx.y  * (x *= blocks->z) +
+           blockIdx.z  * (x *= blocks->y);
+}
+
+//
+// Perform a full mergesort on our section of the data.
+//
+__global__ void gpu_mergesort(Point* source, Point* dest, long size, long width, long slices, dim3* threads, dim3* blocks, Point* p0) {
+    unsigned int idx = getIdx(threads, blocks);
+    long start = width*idx*slices,
+         middle,
+         end;
+
+    for (long slice = 0; slice < slices; slice++) {
+        if (start >= size)
+            break;
+
+        middle = min(start + (width >> 1), size);
+        end = min(start + width, size);
+        gpu_bottomUpMerge(source, dest, start, middle, end, p0);
+        start += width;
+    }
+}
+
+
+void Cuda_Main(Point p[], int s, Point p0){
+
+  long size = 0;
+  Point *points;
+  points = (Point*)malloc(s-1 * sizeof(Point));
+
+  for(int i = 0; i < s-1; i++){
+    points[i] = p[i+1];
+    size++;
+  }
+
+  Point *D_data;
+  Point *D_swp;
+  cudaMalloc((void**)&D_data, size * sizeof(Point));
+  cudaMalloc((void**)&D_swp, size * sizeof(Point));
+
+  dim3 threadsPerBlock(32,1,1);
+  dim3 blocksPerGrid(8,1,1);
+
+  dim3* D_threads;
+  dim3* D_blocks;
+  cudaMalloc((void)&D_threads, size * sizeof(dim3));
+  cudaMalloc((void)&D_blocks , size * sizeof(dim3));
+
+  Point *A = D_data;
+  Point *B = D_swp;
+
+  long nThreads = threadsPerBlock.x * threadsPerBlock.y * threadsPerBlock.z *
+                  blocksPerGrid.x * blocksPerGrid.y * blocksPerGrid.z;
+
+  for (int width = 2; width < (size << 1); width <<= 1) {
+        long slices = size / ((nThreads) * width) + 1;
+
+        if (verbose) {
+            std::cout << "mergeSort - width: " << width
+                      << ", slices: " << slices
+                      << ", nThreads: " << nThreads << '\n';
+            tm();
+        }
+
+        // Actually call the kernel
+        std::cout<< "llamando a a GPU"<<std::endl;
+        gpu_mergesort<<<blocksPerGrid, threadsPerBlock>>>(A, B, size, width, slices, D_threads, D_blocks);
+        std::cout<< "saliendo de la GPU"<<std::endl;
+
+        if (verbose)
+            std::cout << "call mergesort kernel: " << tm() << " microseconds\n";
+
+        // Switch the input / output arrays instead of copying them around
+        A = A == D_data ? D_swp : D_data;
+        B = B == D_data ? D_swp : D_data;
+    }
+
 }
 
 // Prints convex hull of a set of n points.
