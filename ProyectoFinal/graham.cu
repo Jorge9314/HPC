@@ -249,20 +249,28 @@ void convexHull(int argc, char* argv[], Point points[], int n)
    }
 }
 
+void imp_points(int p[][], int size){
+
+  for (int i = 0; i < size; ++i){
+    cout<<p[i][0]<<" "<<p[i][1]<<endl;
+  }
+}
+
 // Driver program to test above functions
 int main(int argc, char* argv[]){
 
     int n;
     cin >> n;
     cout << n << endl;
-    Point points[n];
+    int points[n][2];
 
     for(int i = 0;  i < n; i++){
-        cin >> points[i].x;
-        cin >> points[i].y;
-        cout << points[i].x << " " << points[i].y << endl;
+        cin >> points[i][0];
+        cin >> points[i][1];
     }
 
-    convexHull(argc, argv, points, n);
+    imp_points(points,n);
+
+    //convexHull(argc, argv, points, n);
     return 0;
 }
