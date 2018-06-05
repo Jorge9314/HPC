@@ -5,7 +5,7 @@
 #include <iostream>
 #include <stack>
 #include <stdlib.h>
-#include "mergesort.cu"
+//#include "mergesort.cu"
 
 using namespace std;
 
@@ -43,7 +43,7 @@ int distSq(Point p1, Point p2)
 // 0 --> p, q and r are colinear
 // 1 --> Clockwise
 // 2 --> Counterclockwise
-__device__ int orientation(Point p, Point q, Point r)
+__device__ int orientation_cuda(Point p, Point q, Point r)
 {
     int val = (q.y - p.y) * (r.x - q.x) -
               (q.x - p.x) * (r.y - q.y);
@@ -57,7 +57,7 @@ __device__ int orientation(Point p, Point q, Point r)
 __device__ bool compare_cuda(Point p1, Point p2, Point p0){
 
    // Find orientation
-   int o = orientation(p0, p1, p2);
+   int o = orientation_cuda(p0, p1, p2);
    if (o == 0)
      return false;
 
@@ -110,6 +110,13 @@ __global__ void gpu_mergesort(Point* source, Point* dest, long size, long width,
     }
 }
 
+int orientation(Point p, Point q, Point r){
+    int val = (q.y - p.y) * (r.x - q.x) -
+              (q.x - p.x) * (r.y - q.y);
+
+    if (val == 0) return 0;  // colinear
+    return (val > 0)? 1: 2; // clock or counterclock wise
+}
 
 void Cuda_Main(Point p[], int s, Point p0){
 
@@ -189,7 +196,7 @@ void convexHull(int argc, char* argv[], Point points[], int n)
    // A point p1 comes before p2 in sorted ouput if p2
    // has larger polar angle (in counterclockwise
    // direction) than p1
-   p0 = points[0];
+   Point p0 = points[0];
 
    Cuda_Main(points, n, P0);
 
