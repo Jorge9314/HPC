@@ -9,12 +9,16 @@
 
 using namespace std;
 
+struct Point
+{
+    int x, y;
+};
+
 // A globle point needed for  sorting points with reference
 // to  the first point Used in compare function of qsort()
 
 // A utility function to find next to top in a stack
-Point nextToTop(stack<Point> &S)
-{
+Point nextToTop(stack<Point> &S){
     Point p = S.top();
     S.pop();
     Point res = S.top();
