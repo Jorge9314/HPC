@@ -1,9 +1,11 @@
 // A C++ program to find convex hull of a set of points. Refer
 // http://www.geeksforgeeks.org/orientation-3-ordered-points/
 // for explanation of orientation()
+
 #include <iostream>
 #include <stack>
 #include <stdlib.h>
+
 using namespace std;
 
 struct Point
@@ -95,7 +97,11 @@ void convexHull(Point points[], int n)
    // direction) than p1
    p0 = points[0];
    qsort(&points[1], n-1, sizeof(Point), compare);
-
+   
+   for(int i = 0; i < n; i++){
+      cout<<"("<<points[i].x<<","<<points[i].y<<")"<<endl;
+   }
+   
    // If two or more points make same angle with p0,
    // Remove all but the one that is farthest from p0
    // Remember that, in above sorting, our criteria was
@@ -137,21 +143,85 @@ void convexHull(Point points[], int n)
       S.push(points[i]);
    }
 
+   cout << S.size() << endl;
+
    // Now stack has the output points, print contents of stack
    while (!S.empty())
    {
        Point p = S.top();
-       cout << "(" << p.x << ", " << p.y <<")" << endl;
+       cout << p.x << " " << p.y << endl;
        S.pop();
    }
 }
 
 // Driver program to test above functions
-int main()
-{
-    Point points[] = {{0, 3}, {1, 1}, {2, 2}, {4, 4},
-                      {0, 0}, {1, 2}, {3, 1}, {3, 3}, {2,1}};
-    int n = sizeof(points)/sizeof(points[0]);
+int main(){
+/*
+  Point points[] = {{529, 928},
+  {11, 143},
+  {121, 474},
+  {228, 764},
+  {350, 841},
+  {555, 921},
+  {715, 708},
+  {491, 743},
+  {829, 732},
+  {551, 432},
+  {723, 796},
+  {965, 586},
+  {624, 219},
+  {149, 340},
+  {451, 846},
+  {856, 987},
+  {856, 567},
+  {793, 235},
+  {237, 29},
+  {60, 932},
+  {570, 795},
+  {601, 467},
+  {280, 301},
+  {178, 276},
+  {12, 739},
+  {281, 996},
+  {429, 567},
+  {335, 793},
+  {756, 652},
+  {619, 444},
+  {370, 315},
+  {456, 393},
+  {368, 211},
+  {373, 229},
+  {925, 305},
+  {327, 84},
+  {729, 846},
+  {873, 956},
+  {926, 763},
+  {919, 421},
+  {586, 226},
+  {123, 862},
+  {802, 929},
+  {324, 198},
+  {426, 540},
+  {689, 865},
+  {927, 709},
+  {651, 403},
+  {505, 336},
+  {915, 777},
+  {902, 97},
+  {750, 43},
+  {42, 11}};
+*/
+    int n;
+    cin >> n;
+    cout << n << endl;
+    Point points[n];
+
+    for(int i = 0;  i < n; i++){
+        cin >> points[i].x;
+        cin >> points[i].y;
+        cout << points[i].x << " " << points[i].y << endl;
+    }
+
     convexHull(points, n);
     return 0;
 }

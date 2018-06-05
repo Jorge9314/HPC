@@ -1,0 +1,6 @@
+# como compilar c usando gtk
+gcc -o HolaMundo1 HolaMundo1.c `pkg-config --cflags --libs gtk+-3.0`
+# como compilar usando allegro5
+gcc -Wall allegro.c -o allegro `pkg-config --libs allegro_primitives-5`
+# instalar allegro5
+sudo apt-get install allegro5
