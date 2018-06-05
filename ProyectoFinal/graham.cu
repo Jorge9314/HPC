@@ -9,8 +9,7 @@
 
 using namespace std;
 
-struct Point
-{
+struct Point{
     int x, y;
 };
 
@@ -27,8 +26,7 @@ Point nextToTop(stack<Point> &S){
 }
 
 // A utility function to swap two points
-void swap(Point &p1, Point &p2)
-{
+void swap(Point &p1, Point &p2){
     Point temp = p1;
     p1 = p2;
     p2 = temp;
@@ -36,8 +34,7 @@ void swap(Point &p1, Point &p2)
 
 // A utility function to return square of distance
 // between p1 and p2
-int distSq(Point p1, Point p2)
-{
+int distSq(Point p1, Point p2){
     return (p1.x - p2.x)*(p1.x - p2.x) +
           (p1.y - p2.y)*(p1.y - p2.y);
 }
@@ -47,8 +44,7 @@ int distSq(Point p1, Point p2)
 // 0 --> p, q and r are colinear
 // 1 --> Clockwise
 // 2 --> Counterclockwise
-__device__ int orientation_cuda(Point p, Point q, Point r)
-{
+__device__ int orientation_cuda(Point p, Point q, Point r){
     int val = (q.y - p.y) * (r.x - q.x) -
               (q.x - p.x) * (r.y - q.y);
 
