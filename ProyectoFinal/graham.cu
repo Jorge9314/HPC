@@ -64,11 +64,11 @@ __device__ bool compare_cuda(Point p1, Point p2, Point p0){
    return (o == 2)? true: false;
 }
 
-__device__ void gpu_bottomUpMerge(Point* source, Point* dest, long start, long middle, long end, Point* p0){
+__device__ void gpu_bottomUpMerge(Point* source, Point* dest, long start, long middle, long end, Point p0){
     long i = start;
     long j = middle;
     for (long k = start; k < end; k++) {
-        if (i < middle && (j >= end || compare_cuda(source[i],source[j],p0[0]))) {
+        if (i < middle && (j >= end || compare_cuda(source[i],source[j],p0))) {
             dest[k] = source[i];
             i++;
         } else {
@@ -93,7 +93,7 @@ __device__ unsigned int getIdx(dim3* threads, dim3* blocks) {
 //
 // Perform a full mergesort on our section of the data.
 //
-__global__ void gpu_mergesort(Point* source, Point* dest, long size, long width, long slices, dim3* threads, dim3* blocks, Point* p0) {
+__global__ void gpu_mergesort(Point* source, Point* dest, long size, long width, long slices, dim3* threads, dim3* blocks, Point p0) {
     unsigned int idx = getIdx(threads, blocks);
     long start = width*idx*slices,
          middle,
@@ -139,8 +139,8 @@ void Cuda_Main(Point p[], int s, Point p0){
 
   dim3* D_threads;
   dim3* D_blocks;
-  cudaMalloc((void)&D_threads, size * sizeof(dim3));
-  cudaMalloc((void)&D_blocks , size * sizeof(dim3));
+  cudaMalloc((void**)&D_threads, size * sizeof(dim3));
+  cudaMalloc((void**)&D_blocks , size * sizeof(dim3));
 
   Point *A = D_data;
   Point *B = D_swp;
@@ -151,20 +151,10 @@ void Cuda_Main(Point p[], int s, Point p0){
   for (int width = 2; width < (size << 1); width <<= 1) {
         long slices = size / ((nThreads) * width) + 1;
 
-        if (verbose) {
-            std::cout << "mergeSort - width: " << width
-                      << ", slices: " << slices
-                      << ", nThreads: " << nThreads << '\n';
-            tm();
-        }
-
         // Actually call the kernel
         std::cout<< "llamando a a GPU"<<std::endl;
-        gpu_mergesort<<<blocksPerGrid, threadsPerBlock>>>(A, B, size, width, slices, D_threads, D_blocks);
+        gpu_mergesort<<<blocksPerGrid, threadsPerBlock>>>(A, B, size, width, slices, D_threads, D_blocks, p0);
         std::cout<< "saliendo de la GPU"<<std::endl;
-
-        if (verbose)
-            std::cout << "call mergesort kernel: " << tm() << " microseconds\n";
 
         // Switch the input / output arrays instead of copying them around
         A = A == D_data ? D_swp : D_data;
