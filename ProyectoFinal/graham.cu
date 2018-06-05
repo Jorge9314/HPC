@@ -132,8 +132,8 @@ void Cuda_Main(Point p[], int s, Point p0){
   Point *D_data;
   Point *D_swp;
   cout<<"cuda malloc data and swp"<<endl;
-  cudaMalloc((void**)D_data, size * sizeof(Point));
-  cudaMalloc((void**)D_swp, size * sizeof(Point));
+  cudaMalloc((void**)&D_data, size * sizeof(Point));
+  cudaMalloc((void**)&D_swp, size * sizeof(Point));
   cout<<"cuda malloc fin..."<<endl;
 
   dim3 threadsPerBlock(32,1,1);
