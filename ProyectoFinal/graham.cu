@@ -140,6 +140,7 @@ void Cuda_Main(Point p[], int s, Point p0){
         points[i*2+j] = p[i+1].y;
       }
     }
+    size++;
   }
 
   long *D_data;
@@ -186,9 +187,9 @@ void Cuda_Main(Point p[], int s, Point p0){
   for(int i = 0; i < s-1; i++){
     for(int j = 0; j < 2; j++){
       if(j == 0){
-        p[i].x = points[i*2+j]; 
+        p[i+1].x = points[i*2+j]; 
       }else{
-        p[i].y = points[i*2+j];
+        p[i+1].y = points[i*2+j];
       }
     }
   }
@@ -222,8 +223,6 @@ void convexHull(int argc, char* argv[], Point points[], int n)
    // has larger polar angle (in counterclockwise
    // direction) than p1
    Point p0 = points[0];
-
-   cout<<"llamada a cudamain"<<endl;
 
    Cuda_Main(points, n, p0);
 
