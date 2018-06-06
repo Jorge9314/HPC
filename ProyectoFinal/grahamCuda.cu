@@ -104,7 +104,9 @@ void convexHull(int argc, char* argv[], Point points[], int n)
      point[i] = points[i];
    }
 
-   Cuda_Main(argc, argv, point, n, P0);
+   for(int i = 0; i < n; i++){
+    Cuda_Main(argc, argv, point, n, P0);
+   }
 
    for(int i = 0; i < n; i++){
      points[i] = point[i];
