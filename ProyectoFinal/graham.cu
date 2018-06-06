@@ -5,7 +5,7 @@
 #include <iostream>
 #include <stack>
 #include <stdlib.h>
-//#include "mergesort.cu"
+
 
 using namespace std;
 
@@ -64,7 +64,7 @@ __device__ bool compare_cuda(Point p1, Point p2, Point p0){
    return (o == 2)? true: false;
 }
 
-__device__ void gpu_bottomUpMerge(Point* source, Point* dest, long start, long middle, long end, Point p0){
+__device__ void gpu_bottomUpMerge(long* source, long* dest, long start, long middle, long end, Point p0){
     long i = start;
     long j = middle;
     for (long k = start; k < end; k++) {
@@ -254,7 +254,7 @@ void convexHull(int argc, char* argv[], Point points[], int n)
    }
 }
 
-void imp_points(int p[], int size){
+void imp_points(int p[][2], int size){
 
   for (int i = 0; i < size; ++i){
     cout<<p[i][0]<<" "<<p[i][1]<<endl;
