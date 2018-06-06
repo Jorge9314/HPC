@@ -128,6 +128,11 @@ int orientation(Point p, Point q, Point r){
 
 void Cuda_Main(Point p[], int s, Point p0){
 
+  for (int i = 0; i < s; i++)
+  {
+    cout << p[i].x << " " << p[i].y <<endl;
+  }
+
   long size = 0;
   long *points;
 
@@ -298,7 +303,7 @@ int main(int argc, char* argv[]){
     for(int i = 0;  i < n; i++){
         cin >> points[i].x;
         cin >> points[i].y;
-        cout << points[i].x << " " <<  points[i].y << endl;
+        //cout << points[i].x << " " <<  points[i].y << endl;
     }
 
     //imp_points(points,n);
