@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stack>
 #include <stdlib.h>
+#define min(a, b) (a < b ? a : b)
 
 
 using namespace std;
@@ -126,6 +127,7 @@ void Cuda_Main(Point p[], int s, Point p0){
 
   for(int i = 0; i < s-1; i++){
     points[i] = (long*)malloc(2*sizeof(long));
+    size++;
   }
 
   for(int i = 0; i < s-1; i++){
@@ -138,12 +140,14 @@ void Cuda_Main(Point p[], int s, Point p0){
     }
   }
 
-  long *D_data;
-  long *D_swp;
+  long** D_data;
+  long** D_swp;
   cout<<"cuda malloc data and swp"<<endl;
-  cudaMalloc((void**)&D_data, size * sizeof(long));
-  cudaMalloc((void**)&D_swp, size * sizeof(long));
+  cudaMalloc((void**)&D_data, size * sizeof(long*));
+  cudaMalloc((void**)&D_swp, size * sizeof(long*));
   cout<<"cuda malloc fin..."<<endl;
+
+  cudaMemcpy(D_data, data, size * sizeof(Point), cudaMemcpyHostToDevice);
 
   dim3 threadsPerBlock(32,1,1);
   dim3 blocksPerGrid(8,1,1);
@@ -152,6 +156,9 @@ void Cuda_Main(Point p[], int s, Point p0){
   dim3* D_blocks;
   cudaMalloc((void**)&D_threads, size * sizeof(dim3));
   cudaMalloc((void**)&D_blocks , size * sizeof(dim3));
+
+  cudaMemcpy(D_threads, &threadsPerBlock, sizeof(dim3), cudaMemcpyHostToDevice);
+  cudaMemcpy(D_blocks, &blocksPerGrid, sizeof(dim3), cudaMemcpyHostToDevice);
 
   long *A = D_data;
   long *B = D_swp;
