@@ -5,7 +5,6 @@
 #include <iostream>
 #include <stack>
 #include <stdlib.h>
-#define min(a, b) (a < b ? a : b)
 
 
 using namespace std;
@@ -94,7 +93,7 @@ __device__ unsigned int getIdx(dim3* threads, dim3* blocks) {
 //
 // Perform a full mergesort on our section of the data.
 //
-__global__ void gpu_mergesort(long** source, long** dest, long size, long width, long slices, dim3* threads, dim3* blocks, Point p0) {
+__global__ void gpu_mergesort(long* source, long* dest, long size, long width, long slices, dim3* threads, dim3* blocks, Point p0) {
     unsigned int idx = getIdx(threads, blocks);
     long start = width*idx*slices,
          middle,
@@ -122,32 +121,25 @@ int orientation(Point p, Point q, Point r){
 void Cuda_Main(Point p[], int s, Point p0){
 
   long size = 0;
-  long** points;
-  points = (long**)malloc(s-1 * sizeof(long*));
-
-  for(int i = 0; i < s-1; i++){
-    points[i] = (long*)malloc(2*sizeof(long));
-    size++;
-  }
+  long *points;
+  points = (long*)malloc(s-1 * 2 * sizeof(long));
 
   for(int i = 0; i < s-1; i++){
     for(int j = 0; j < 2; j++){
       if(j == 0){
-        points[i][j] = p[i].x; 
+        points[i*2+j] = p[i].x; 
       }else{
-        points[i][j] = p[i].y;
+        points[i*2+j] = p[i].y;
       }
     }
   }
 
-  long** D_data;
-  long** D_swp;
+  long *D_data;
+  long *D_swp;
   cout<<"cuda malloc data and swp"<<endl;
-  cudaMalloc((void**)&D_data, size * sizeof(long*));
-  cudaMalloc((void**)&D_swp, size * sizeof(long*));
+  cudaMalloc((void**)&D_data, size * sizeof(long));
+  cudaMalloc((void**)&D_swp, size * sizeof(long));
   cout<<"cuda malloc fin..."<<endl;
-
-  cudaMemcpy(D_data, data, size * sizeof(Point), cudaMemcpyHostToDevice);
 
   dim3 threadsPerBlock(32,1,1);
   dim3 blocksPerGrid(8,1,1);
@@ -157,11 +149,8 @@ void Cuda_Main(Point p[], int s, Point p0){
   cudaMalloc((void**)&D_threads, size * sizeof(dim3));
   cudaMalloc((void**)&D_blocks , size * sizeof(dim3));
 
-  cudaMemcpy(D_threads, &threadsPerBlock, sizeof(dim3), cudaMemcpyHostToDevice);
-  cudaMemcpy(D_blocks, &blocksPerGrid, sizeof(dim3), cudaMemcpyHostToDevice);
-
-  long** A = D_data;
-  long** B = D_swp;
+  long *A = D_data;
+  long *B = D_swp;
 
   long nThreads = threadsPerBlock.x * threadsPerBlock.y * threadsPerBlock.z *
                   blocksPerGrid.x * blocksPerGrid.y * blocksPerGrid.z;
