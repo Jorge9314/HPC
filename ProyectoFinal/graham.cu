@@ -136,6 +136,7 @@ void Cuda_Main(Point p[], int s, Point p0){
   for(int i = 0; i < s-1; i++){
     for(int j = 0; j < 2; j++){
       if(j == 0){
+        cout <<"["<< i*2+j<<"]" << endl;
         points[i*2+j] = p[i+1].x; 
       }
       if(j == 1){
