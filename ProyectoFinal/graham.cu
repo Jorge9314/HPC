@@ -130,15 +130,15 @@ void Cuda_Main(Point p[], int s, Point p0){
 
   long size = 0;
   long *points;
-  cout << "memoria malloc" << endl;
+
   points = (long*)malloc(s-1 * 2 * sizeof(long));
-  cout << "fin malloc" << endl;
 
   for(int i = 0; i < s-1; i++){
     for(int j = 0; j < 2; j++){
       if(j == 0){
         points[i*2+j] = p[i+1].x; 
-      }else{
+      }
+      if(j == 1){
         points[i*2+j] = p[i+1].y;
       }
     }
