@@ -223,6 +223,8 @@ void convexHull(int argc, char* argv[], Point points[], int n)
    // direction) than p1
    Point p0 = points[0];
 
+   cout<<"llamada a cudamain"<<endl;
+
    Cuda_Main(points, n, p0);
 
    for(int i = 0; i < n; i++){
