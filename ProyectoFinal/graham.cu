@@ -44,9 +44,9 @@ int distSq(Point p1, Point p2){
 // 0 --> p, q and r are colinear
 // 1 --> Clockwise
 // 2 --> Counterclockwise
-__device__ int orientation_cuda(Point p, Point q, Point r){
-    int val = (q.y - p.y) * (r.x - q.x) -
-              (q.x - p.x) * (r.y - q.y);
+__device__ int orientation_cuda(Point p, long q[], long r[]){
+    int val = (q[1] - p.y) * (r[0] - q.x) -
+              (q[0] - p.x) * (r[1] - q.y);
 
     if (val == 0) return 0;  // colinear
     return (val > 0)? 1: 2; // clock or counterclock wise
@@ -54,7 +54,7 @@ __device__ int orientation_cuda(Point p, Point q, Point r){
 
 // A function used by library function qsort() to sort an array of
 // points with respect to the first point
-__device__ bool compare_cuda(Point p1, Point p2, Point p0){
+__device__ bool compare_cuda(long p1[], long p2[], Point p0){
 
    // Find orientation
    int o = orientation_cuda(p0, p1, p2);
@@ -121,15 +121,19 @@ int orientation(Point p, Point q, Point r){
 void Cuda_Main(Point p[], int s, Point p0){
 
   long size = 0;
-  long *points;
-  points = (long*)malloc(s-1 * 2 * sizeof(long));
+  long** points;
+  points = (long**)malloc(s-1 * sizeof(long*));
+
+  for(int i = 0; i < s-1; i++){
+    points[i] = (long*)malloc(2*sizeof(long));
+  }
 
   for(int i = 0; i < s-1; i++){
     for(int j = 0; j < 2; j++){
       if(j == 0){
-        points[i*2+j] = p[i].x; 
+        points[i][j] = p[i].x; 
       }else{
-        points[i*2+j] = p[i].y;
+        points[i][j] = p[i].y;
       }
     }
   }
