@@ -132,6 +132,7 @@ void Cuda_Main(Point p[], int s, Point p0){
   long *points;
   cout << "memoria malloc" << endl;
   points = (long*)malloc(s-1 * 2 * sizeof(long));
+  cout << "fin malloc" << endl;
 
   for(int i = 0; i < s-1; i++){
     for(int j = 0; j < 2; j++){
