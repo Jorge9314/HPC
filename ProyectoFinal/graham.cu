@@ -44,9 +44,9 @@ int distSq(Point p1, Point p2){
 // 0 --> p, q and r are colinear
 // 1 --> Clockwise
 // 2 --> Counterclockwise
-__device__ int orientation_cuda(Point p, long q[], long r[]){
-    int val = (q[1] - p.y) * (r[0] - q[0]) -
-              (q[0] - p.x) * (r[1] - q[1]);
+__device__ int orientation_cuda(Point p, Point q, Point r){
+    int val = (q.y - p.y) * (r.x - q.x) -
+              (q.x - p.x) * (r.y - q.y);
 
     if (val == 0) return 0;  // colinear
     return (val > 0)? 1: 2; // clock or counterclock wise
@@ -54,7 +54,7 @@ __device__ int orientation_cuda(Point p, long q[], long r[]){
 
 // A function used by library function qsort() to sort an array of
 // points with respect to the first point
-__device__ bool compare_cuda(long p1[], long p2[], Point p0){
+__device__ bool compare_cuda(Point p1, Point p2, Point p0){
 
    // Find orientation
    int o = orientation_cuda(p0, p1, p2);
@@ -67,13 +67,19 @@ __device__ bool compare_cuda(long p1[], long p2[], Point p0){
 __device__ void gpu_bottomUpMerge(long* source, long* dest, long start, long middle, long end, Point p0){
     long i = start;
     long j = middle;
-    for (long k = start; k < end; k++) {
-        if (i < middle && (j >= end || compare_cuda(source[i],source[j],p0))) {
+    for (long k = start; k < end; k+=2) {
+        Point p1;
+        p1.x = source[i];
+        p1.y = source[i+1];
+        Point p2;
+        p2.x = source[i];
+        p2.y = source[i+1];
+        if (i < middle && (j >= end || compare_cuda(p1,p2,p0))) {
             dest[k] = source[i];
-            i++;
+            i+=2;
         } else {
             dest[k] = source[j];
-            j++;
+            j+=2;
         }
     }
 }
