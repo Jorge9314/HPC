@@ -122,18 +122,23 @@ void Cuda_Main(Point p[], int s, Point p0){
 
   long size = 0;
   long *points;
-  points = (Point*)malloc(s-1 * sizeof(Point));
+  points = (long*)malloc(s-1 * 2 * sizeof(long));
 
   for(int i = 0; i < s-1; i++){
-    points[i] = p[i+1];
-    size++;
+    for(int j = 0; j < 2; j++){
+      if(j == 0){
+        points[i*2+j] = p[i].x; 
+      }else{
+        points[i*2+j] = p[i].y;
+      }
+    }
   }
 
-  int *D_data;
-  int *D_swp;
+  long *D_data;
+  long *D_swp;
   cout<<"cuda malloc data and swp"<<endl;
-  //cudaMalloc((void**)&D_data, size * sizeof(int));
-  //cudaMalloc((void**)&D_swp, size * sizeof(int));
+  cudaMalloc((void**)&D_data, size * sizeof(long));
+  cudaMalloc((void**)&D_swp, size * sizeof(long));
   cout<<"cuda malloc fin..."<<endl;
 
   dim3 threadsPerBlock(32,1,1);
@@ -144,8 +149,8 @@ void Cuda_Main(Point p[], int s, Point p0){
   cudaMalloc((void**)&D_threads, size * sizeof(dim3));
   cudaMalloc((void**)&D_blocks , size * sizeof(dim3));
 
-  Point *A = D_data;
-  Point *B = D_swp;
+  long *A = D_data;
+  long *B = D_swp;
 
   long nThreads = threadsPerBlock.x * threadsPerBlock.y * threadsPerBlock.z *
                   blocksPerGrid.x * blocksPerGrid.y * blocksPerGrid.z;
