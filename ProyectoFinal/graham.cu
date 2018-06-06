@@ -130,6 +130,7 @@ void Cuda_Main(Point p[], int s, Point p0){
 
   long size = 0;
   long *points;
+  cout << "memoria malloc" << endl;
   points = (long*)malloc(s-1 * 2 * sizeof(long));
 
   for(int i = 0; i < s-1; i++){
@@ -146,11 +147,11 @@ void Cuda_Main(Point p[], int s, Point p0){
   long *D_data;
   long *D_swp;
   cout<<"cuda malloc data and swp"<<endl;
-  cudaMalloc((void**)&D_data, size * sizeof(long));
-  cudaMalloc((void**)&D_swp, size * sizeof(long));
+  cudaMalloc((void**)&D_data, 2 * size * sizeof(long));
+  cudaMalloc((void**)&D_swp, 2 * size * sizeof(long));
   cout<<"cuda malloc fin..."<<endl;
 
-  cudaMemcpy(D_data, points, size * sizeof(Point), cudaMemcpyHostToDevice);
+  cudaMemcpy(D_data, points, 2 * size * sizeof(Point), cudaMemcpyHostToDevice);
 
   dim3 threadsPerBlock(32,1,1);
   dim3 blocksPerGrid(8,1,1);
