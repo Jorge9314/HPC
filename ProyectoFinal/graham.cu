@@ -121,7 +121,7 @@ int orientation(Point p, Point q, Point r){
 void Cuda_Main(Point p[], int s, Point p0){
 
   long size = 0;
-  Point *points;
+  long *points;
   points = (Point*)malloc(s-1 * sizeof(Point));
 
   for(int i = 0; i < s-1; i++){
@@ -132,8 +132,8 @@ void Cuda_Main(Point p[], int s, Point p0){
   int *D_data;
   int *D_swp;
   cout<<"cuda malloc data and swp"<<endl;
-  cudaMalloc((void**)&D_data, size * sizeof(int));
-  cudaMalloc((void**)&D_swp, size * sizeof(int));
+  //cudaMalloc((void**)&D_data, size * sizeof(int));
+  //cudaMalloc((void**)&D_swp, size * sizeof(int));
   cout<<"cuda malloc fin..."<<endl;
 
   dim3 threadsPerBlock(32,1,1);
