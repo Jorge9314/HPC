@@ -147,6 +147,8 @@ void Cuda_Main(Point p[], int s, Point p0){
   cudaMalloc((void**)&D_swp, size * sizeof(long));
   cout<<"cuda malloc fin..."<<endl;
 
+  cudaMemcpy(D_data, points, size * sizeof(Point), cudaMemcpyHostToDevice);
+
   dim3 threadsPerBlock(32,1,1);
   dim3 blocksPerGrid(8,1,1);
 
@@ -154,6 +156,9 @@ void Cuda_Main(Point p[], int s, Point p0){
   dim3* D_blocks;
   cudaMalloc((void**)&D_threads, size * sizeof(dim3));
   cudaMalloc((void**)&D_blocks , size * sizeof(dim3));
+
+  cudaMemcpy(D_threads, &threadsPerBlock, sizeof(dim3), cudaMemcpyHostToDevice);
+  cudaMemcpy(D_blocks, &blocksPerGrid, sizeof(dim3), cudaMemcpyHostToDevice);
 
   long *A = D_data;
   long *B = D_swp;
@@ -173,6 +178,21 @@ void Cuda_Main(Point p[], int s, Point p0){
         A = A == D_data ? D_swp : D_data;
         B = B == D_data ? D_swp : D_data;
     }
+
+  cudaMemcpy(points, A, size * sizeof(Point), cudaMemcpyDeviceToHost);
+
+  for(int i = 0; i < s-1; i++){
+    for(int j = 0; j < 2; j++){
+      if(j == 0){
+        p[i].x = points[i*2+j]; 
+      }else{
+        p[i].y = points[i*2+j];
+      }
+    }
+  }
+
+  cudaFree(D_data);
+  cudaFree(D_swp);
 
 }
 
@@ -260,28 +280,22 @@ void convexHull(int argc, char* argv[], Point points[], int n)
    }
 }
 
-void imp_points(int p[][2], int size){
-
-  for (int i = 0; i < size; ++i){
-    cout<<p[i][0]<<" "<<p[i][1]<<endl;
-  }
-}
-
 // Driver program to test above functions
 int main(int argc, char* argv[]){
 
     int n;
     cin >> n;
     cout << n << endl;
-    int points[n][2];
+    Point points[n];
 
     for(int i = 0;  i < n; i++){
-        cin >> points[i][0];
-        cin >> points[i][1];
+        cin >> points[i].x;
+        cin >> points[i].y;
+        cout << points[i].x << " " <<  points[i].y << endl;
     }
 
-    imp_points(points,n);
+    //imp_points(points,n);
 
-    //convexHull(argc, argv, points, n);
+    convexHull(argc, argv, points, n);
     return 0;
 }
