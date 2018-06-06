@@ -160,8 +160,8 @@ void Cuda_Main(Point p[], int s, Point p0){
   cudaMemcpy(D_threads, &threadsPerBlock, sizeof(dim3), cudaMemcpyHostToDevice);
   cudaMemcpy(D_blocks, &blocksPerGrid, sizeof(dim3), cudaMemcpyHostToDevice);
 
-  long *A = D_data;
-  long *B = D_swp;
+  long** A = D_data;
+  long** B = D_swp;
 
   long nThreads = threadsPerBlock.x * threadsPerBlock.y * threadsPerBlock.z *
                   blocksPerGrid.x * blocksPerGrid.y * blocksPerGrid.z;
