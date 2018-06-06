@@ -45,8 +45,8 @@ int distSq(Point p1, Point p2){
 // 1 --> Clockwise
 // 2 --> Counterclockwise
 __device__ int orientation_cuda(Point p, long q[], long r[]){
-    int val = (q[1] - p.y) * (r[0] - q.x) -
-              (q[0] - p.x) * (r[1] - q.y);
+    int val = (q[1] - p.y) * (r[0] - q[0]) -
+              (q[0] - p.x) * (r[1] - q[1]);
 
     if (val == 0) return 0;  // colinear
     return (val > 0)? 1: 2; // clock or counterclock wise
